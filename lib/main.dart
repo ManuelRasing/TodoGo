@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'dart:io';
-
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'models/taskCategory.dart';
+
 
 Future<String> fetchData() async {
   const url = 'https://api.api-ninjas.com/v1/quotes?category=happiness';
@@ -28,8 +29,9 @@ Future<String> fetchData() async {
 }
 
 void main() {
+  // fetchData();
   runApp(const MyApp());
-  fetchData();
+  
 }
 
 class MyApp extends StatelessWidget {
@@ -61,32 +63,71 @@ class _MyHomePageState extends State<MyHomePage> {
   final containerKey = GlobalKey();
   Size? containerSize;
   double? categoryHeight;
-  double catHeight = 10.0;
+  double catHeight = 0.0;
+  DateTime dateNow = DateTime.now();
+  var formattedDate;
+  var formattedTime;
+  late String timeOfTheDay;
+  late String dayOrNight;
+  Timer? _timer;
 
+  final categoryList = <int>[1,2,3,4,5,6,7,8,9,10];
+  
   @override
+
+  
   void initState() {
     super.initState();
+    formattedDate = DateFormat('dd MMMM yyyy').format(dateNow);
+    formattedTime = DateFormat('HH').format(dateNow);
+    if (dateNow.hour >= 18){
+        timeOfTheDay = 'Good Evening';
+        dayOrNight = 'assets/images/cloudy.png';
+    }else if(dateNow.hour >= 12){
+        timeOfTheDay = 'Good Afternoon';
+    }else if(dateNow.hour >= 01){
+        timeOfTheDay = 'Good Morning';
+        dayOrNight = 'assets/images/autumn.png';
+    } 
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+            setState(() {
+              dateNow = DateTime.now();
+              formattedDate = DateFormat('dd MMM yyyy').format(dateNow);
+              formattedTime = DateFormat('HH').format(dateNow);
+            });
+            if (dateNow.hour >= 18){
+                timeOfTheDay = 'Good Evening';
+                dayOrNight = 'assets/images/cloudy.png';
+            }else if(dateNow.hour >= 12){
+                timeOfTheDay = 'Good Afternoon';
+            }else if(dateNow.hour >= 01){
+                timeOfTheDay = 'Good Morning';
+                dayOrNight = 'assets/images/autumn.png';
+            } 
+    });
+    print(formattedTime);
     fetchData().then((response) {
       setState(() {
         quote = response;
       });
-      Timer(const Duration(seconds: 2), () {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
           getContainerSize();
-          catHeight = 500.0;
           categoryHeight = containerSize?.height;
-          print(catHeight);
-          catHeight = catHeight - categoryHeight!.toDouble();
-          print(catHeight);
-          catHeight = MediaQuery.of(context).size.height - catHeight;
-          print(catHeight);
+          catHeight = MediaQuery.of(context).size.height - categoryHeight!.toDouble();
+          catHeight = catHeight - 245;
         });
-      });
+      
     }).catchError((error) {
       setState(() {
         quote = 'Failed to fetch data';
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   void getContainerSize() {
@@ -100,8 +141,28 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+    List<TaskCategory> taskCategories = [
+    TaskCategory('Personal', 'assets/images/personal.png'),
+    TaskCategory('Health and Fitness', 'assets/images/Health.png'),
+    TaskCategory('Educational', 'assets/images/academic.png'),
+    TaskCategory('Work', 'assets/images/work.png'),
+    TaskCategory('Home', 'assets/images/chores.png'),
+    TaskCategory('Finance', 'assets/images/finance.png'),
+    TaskCategory('Shopping', 'assets/images/shopping.png'),
+    TaskCategory('Social', 'assets/images/social.png'),
+    TaskCategory('Hobbies', 'assets/images/hobbies.png'),
+    TaskCategory('Travel', 'assets/images/travel.png'),
+    TaskCategory('Add', 'assets/images/add.png'),
+  ];
 
+  String truncateText(String text, int maxLength) {
+  if (text.length <= maxLength) {
+    return text;
+  } else {
+    return text.substring(0, maxLength) + '...';
+  }
+}
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     return Scaffold(
       backgroundColor: Color(0xffF5F3C1),
       body: Padding(
@@ -113,9 +174,9 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      '08 June 2023',
+                      formattedDate,
                       textAlign: TextAlign.right,
                       style: TextStyle(
                         fontFamily: 'Apollo',
@@ -125,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     Text(
-                      'Good Morning',
+                      timeOfTheDay,
                       textAlign: TextAlign.left,
                       style: TextStyle(
                           fontFamily: 'Apollo',
@@ -145,7 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
                 Image.asset(
-                  'assets/images/autumn.png',
+                  dayOrNight,
                   width: 173,
                   height: 141,
                 )
@@ -162,7 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: Color.fromARGB(131, 14, 162, 147), width: 1.0),
                   borderRadius: BorderRadius.circular(15)),
               child: Text(
-                quote,
+                '"\ $quote \"',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 20,
@@ -196,178 +257,151 @@ class _MyHomePageState extends State<MyHomePage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: ListView.builder(
-                    itemCount:
-                        10, // Set the number of items in the scrollable list
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 10, bottom: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                                width: 160,
-                                height: 130,
-                                padding: EdgeInsets.fromLTRB(5, 20, 5, 20),
-                                decoration: BoxDecoration(
-                                    color: Color(0xff27E1C1),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 3,
-                                        blurRadius: 1,
-                                        offset: const Offset(3, 3),
-                                      )
-                                    ],
-                                    border: Border.all(
-                                        color: Color(0xff27E1C1), width: 1.0),
-                                    borderRadius: BorderRadius.circular(15)),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Image.asset(
-                                          'assets/images/personal.png',
-                                          height: 50,
-                                          width: 50,
-                                        ),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: const [
-                                            Text(
-                                              'Personal',
-                                              style: TextStyle(
-                                                color: Color(0xff270564),
-                                                fontSize: 18,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            Text('Task',
+                  child: GridView.count(crossAxisCount: 2,
+                  mainAxisSpacing: 15,
+                  crossAxisSpacing: 15,
+                  children:
+                   List.generate(taskCategories.length, (index) {
+                      if(taskCategories[index].categoryTitle == 'Add'){
+                        return Padding(padding: EdgeInsets.all(5),
+                      child: InkWell(
+                        onTap: () {
+                          print(taskCategories[index].categoryTitle + ' tapped');
+                        },
+                        child: Container(
+                                  padding: EdgeInsets.fromLTRB(5, 20, 5, 0),
+                                  decoration: BoxDecoration(
+                                      color: Color(0xff27E1C1),
+                                      border: Border.all(
+                                          color: Color(0xff27E1C1), width: 1.0),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 3,
+                                          blurRadius: 1,
+                                          offset: const Offset(3, 3),
+                                        )
+                                      ],
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Image.asset(
+                                            taskCategories[index].categoryIcon,
+                                            height: 50,
+                                            width: 50,
+                                          ),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: const [
+                                              Text(
+                                                'Add \nCategory',
+                                                textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                   color: Color(0xff270564),
                                                   fontSize: 18,
                                                   fontFamily: 'Poppins',
-                                                ))
-                                          ],
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              
+                                            ],
+                                          )
+                                    ],
+                                  ),),
+                      ),); 
+                      } else{
+                        return Padding(padding: EdgeInsets.all(5),
+                      child: InkWell(
+                        onTap: () {
+                          print(taskCategories[index].categoryTitle + ' tapped');
+                        },
+                        child: Container(
+                                  padding: EdgeInsets.fromLTRB(5, 20, 5, 0),
+                                  decoration: BoxDecoration(
+                                      color: Color(0xff27E1C1),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 3,
+                                          blurRadius: 1,
+                                          offset: const Offset(3, 3),
                                         )
                                       ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 12.0),
-                                      child: Row(
+                                      border: Border.all(
+                                          color: Color(0xff27E1C1), width: 1.0),
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceEvenly,
                                         children: [
                                           Image.asset(
-                                            'assets/images/list.png',
-                                            width: 20,
-                                            height: 20,
+                                            taskCategories[index].categoryIcon,
+                                            height: 50,
+                                            width: 50,
                                           ),
-                                          Text(
-                                            '20 Tasks',
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                fontFamily: 'Inter',
-                                                color: Color(0xff0EA293)),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                truncateText(taskCategories[index].categoryTitle, 9),
+                                                style: const TextStyle(
+                                                  color: Color(0xff270564),
+                                                  fontSize: 18,
+                                                  fontFamily: 'Poppins',
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              Text('Task',
+                                                  style: TextStyle(
+                                                    color: Color(0xff270564),
+                                                    fontSize: 18,
+                                                    fontFamily: 'Poppins',
+                                                  ))
+                                            ],
                                           )
                                         ],
                                       ),
-                                    )
-                                  ],
-                                )),
-                            Container(
-                                width: 160,
-                                height: 130,
-                                padding: EdgeInsets.fromLTRB(5, 20, 5, 20),
-                                decoration: BoxDecoration(
-                                    color: Color(0xff27E1C1),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 3,
-                                        blurRadius: 1,
-                                        offset: const Offset(3, 3),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 12.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/list.png',
+                                              width: 25,
+                                              height: 25,
+                                            ),
+                                            Text(
+                                              '20 Tasks',
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontFamily: 'Inter',
+                                                  color: Color(0xff0EA293)),
+                                            )
+                                          ],
+                                        ),
                                       )
                                     ],
-                                    border: Border.all(
-                                        color: Color(0xff27E1C1), width: 1.0),
-                                    borderRadius: BorderRadius.circular(15)),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Image.asset(
-                                          'assets/images/personal.png',
-                                          height: 50,
-                                          width: 50,
-                                        ),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: const [
-                                            Text(
-                                              'Personal',
-                                              style: TextStyle(
-                                                color: Color(0xff270564),
-                                                fontSize: 18,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            Text('Task',
-                                                style: TextStyle(
-                                                  color: Color(0xff270564),
-                                                  fontSize: 18,
-                                                  fontFamily: 'Poppins',
-                                                ))
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 12.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Image.asset(
-                                            'assets/images/list.png',
-                                            width: 20,
-                                            height: 20,
-                                          ),
-                                          Text(
-                                            '20 Tasks',
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                fontFamily: 'Inter',
-                                                color: Color(0xff0EA293)),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ))
-                          ],
-                        ),
-                      );
-                    },
+                                  ),),
+                      ),);
+                      }
+                    })
+                  ,
                   ),
-                ),
+                  ),
               ),
             ),
           ],
