@@ -85,6 +85,9 @@ flutter:
     - family: Aylafs
       fonts:
         - asset: assets/fonts/Aylafs.otf
+    - family: aAkhirTahun
+      fonts:
+        - asset: assets/fonts/aAkhirTahun.ttf
     - family: PatrickHand
       fonts:
         - asset: assets/fonts/PatrickHand-Regular.ttf
