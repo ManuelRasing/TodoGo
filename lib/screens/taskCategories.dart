@@ -1,9 +1,9 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:todo_app/models/todos.dart';
 
 class Category extends StatefulWidget {
   const Category({super.key});
@@ -12,14 +12,19 @@ class Category extends StatefulWidget {
   State<Category> createState() => _CategoryState();
 }
 
-class _CategoryState extends State<Category> {
+class _CategoryState extends State<Category> with TickerProviderStateMixin{
 
   DateTime dateNow = DateTime.now();
 
   // void initState(){
 
   // }
-  
+
+  @override
+
+
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -27,7 +32,14 @@ class _CategoryState extends State<Category> {
   String  formattedDay = DateFormat('dd').format(dateNow);
   String  formattedYear = DateFormat('yyyy').format(dateNow);
 
-  bool isDone = false;
+  String truncateText(String text, int maxLength) {
+  if (text.length <= maxLength) {
+    return text;
+  } else {
+    return '${text.substring(0, maxLength)}...';
+  }
+}
+  
   
     return Scaffold(
       backgroundColor: Color(0xffF5F3C1),
@@ -86,20 +98,30 @@ class _CategoryState extends State<Category> {
               height: 664,
               margin: EdgeInsets.only(top: 30),
               padding: EdgeInsets.fromLTRB(15, 30, 15, 5),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xff27E1C1),
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(55), topRight: Radius.circular(55))
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Text('ToDo List',
-                  
-                  style: TextStyle(
-                    fontFamily: 'Aylafs',
-                    fontSize: 40,
-                    color: Color(0xff0EA293),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const Text('ToDo List',
+                      style: TextStyle(
+                        fontFamily: 'Aylafs',
+                        fontSize: 40,
+                        color: Color(0xff0EA293),
                   ),),
+                  Container(
+                    margin: EdgeInsets.only(left: 90, right: 30),
+                    child: Image.asset('assets/images/add_task.png',
+                    width: 25,
+                    height: 25,),
+                  )
+                    ],
+                  ),
                   Container(
                     height: 592,
                     child: SingleChildScrollView(
@@ -108,10 +130,11 @@ class _CategoryState extends State<Category> {
                           height: 592,
                           child: 
                             ListView.builder(
-                          itemCount: 10,
+                          itemCount: Todos.myTodos.length,
                           itemBuilder: (BuildContext context, int index) {
                           return Container(
                             margin: EdgeInsets.only(top: 10),
+                            padding: EdgeInsets.only(right: 15),
                             width: MediaQuery.of(context).size.width -30,
                             height: 70,
                             decoration: BoxDecoration(
@@ -121,26 +144,61 @@ class _CategoryState extends State<Category> {
                             child: Row(
                                 // mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
-                                  AnimatedContainer(
-                                    duration: const Duration(milliseconds: 700),
-                                    width: 40,
-                                    height: 40,
-                                    margin: EdgeInsets.only(left: 20, right: 20),
-                                    decoration: BoxDecoration(
-                                      color: Color(0xffF5F3C1),
-                                      border: Border.all(
-                                        color: Color(0xff270564),
-                                        width: 3
+                                  GestureDetector(
+                                    onTap: () {
+                                      if(Todos.myTodos[index].isDone == true){
+                                          setState(() {
+                                            Todos.myTodos[index].isDone = false;
+                                          });
+                                          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('na tap mo na bobo $isDone' )));
+                                        }else{
+                                          setState(() {
+                                            Todos.myTodos[index].isDone = true;
+                                          });
+                                          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('na tap mo na bobo $isDone' )));
+                                        }
+                                      
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 700),
+                                      width: 40,
+                                      height: 40,
+                                      margin: EdgeInsets.only(left: 20, right: 20),
+                                      decoration: BoxDecoration(
+                                        color: Color(0xffF5F3C1),
+                                        border: Border.all(
+                                          color: Color(0xff270564),
+                                          width: 3
+                                        ),
+                                        borderRadius: BorderRadius.circular(8)
                                       ),
-                                      borderRadius: BorderRadius.circular(8)
+                                      child: 
+                                      Todos.myTodos[index].isDone ? 
+                                      Icon(
+                                        Icons.check, 
+                                        size: 30,
+                                        color: Color(0xff27E1C1),)
+                                        : null,
                                     ),
                                   ),
-                                  Text('Something you want to do....',
+                                  Expanded(
+                                    child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(truncateText(Todos.myTodos[index].doThis, 26),
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontFamily: 'Poppins',
                                     color: Color(0xffF5F3C1),
-                                  ),)
+                                  ),),
+                                  Text('${Todos.myTodos[index].whatTimehr}:${Todos.myTodos[index].whatTimemin}',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 19,
+                                    color: Color(0xff27E1C1)
+                                  ), )
+                                    ],
+                                  ))
                                 ],
                             ),
                           );

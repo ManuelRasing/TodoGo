@@ -11,7 +11,7 @@ import '../models/taskCategory.dart';
 Future<String> fetchData() async {
   const url = 'https://api.api-ninjas.com/v1/quotes?category=happiness';
   const apiKey =
-      '1+PpC2J6tJpucOHYp7z9LQ==cN31nKX8Si9qxA6j'; // Replace with your actual API key
+      '1+PpC2J6tJpucOHYp7z9LQ==cN31nKX8Si9qxA6j'; // Replace with your actual API key from https://api-ninjas.com/
 
   final response = await http.get(
     Uri.parse(url),
@@ -124,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   @override
   Widget build(BuildContext context) {
+    
     List<TaskCategory> taskCategories = [
     TaskCategory('Personal', 'assets/images/personal.png'),
     TaskCategory('Health and Fitness', 'assets/images/Health.png'),
