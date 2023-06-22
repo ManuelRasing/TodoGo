@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:todo_app/models/todos.dart';
+import 'package:todo_app/screens/addtask_widget.dart';
 
 class Category extends StatefulWidget {
   const Category({super.key});
@@ -15,6 +16,7 @@ class Category extends StatefulWidget {
 class _CategoryState extends State<Category> with TickerProviderStateMixin{
 
   DateTime dateNow = DateTime.now();
+
 
   // void initState(){
 
@@ -31,6 +33,8 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
   String  formattedMonth = DateFormat('MMM').format(dateNow);
   String  formattedDay = DateFormat('dd').format(dateNow);
   String  formattedYear = DateFormat('yyyy').format(dateNow);
+
+  bool addClicked = false;
 
   String truncateText(String text, int maxLength) {
   if (text.length <= maxLength) {
@@ -116,9 +120,16 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
                   ),),
                   Container(
                     margin: EdgeInsets.only(left: 90, right: 30),
-                    child: Image.asset('assets/images/add_task.png',
-                    width: 25,
-                    height: 25,),
+                    child: GestureDetector(
+                      onTap: () {
+                        addClicked = true;
+                        print('tapped');
+                        _showAddTask(context);
+                      },
+                      child: Image.asset('assets/images/add_task.png',
+                      width: 25,
+                      height: 25,),
+                    ),
                   )
                     ],
                   ),
@@ -126,85 +137,84 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
                     height: 592,
                     child: SingleChildScrollView(
                       scrollDirection: Axis.vertical,
-                        child: Container(
-                          height: 592,
-                          child: 
-                            ListView.builder(
-                          itemCount: Todos.myTodos.length,
-                          itemBuilder: (BuildContext context, int index) {
-                          return Container(
-                            margin: EdgeInsets.only(top: 10),
-                            padding: EdgeInsets.only(right: 15),
-                            width: MediaQuery.of(context).size.width -30,
-                            height: 70,
-                            decoration: BoxDecoration(
-                              color: Color(0xff0EA293),
-                              borderRadius: BorderRadius.circular(9),
-                            ),
-                            child: Row(
-                                // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      if(Todos.myTodos[index].isDone == true){
-                                          setState(() {
-                                            Todos.myTodos[index].isDone = false;
-                                          });
-                                          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('na tap mo na bobo $isDone' )));
-                                        }else{
-                                          setState(() {
-                                            Todos.myTodos[index].isDone = true;
-                                          });
-                                          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('na tap mo na bobo $isDone' )));
-                                        }
-                                      
-                                    },
-                                    child: AnimatedContainer(
-                                      duration: const Duration(milliseconds: 700),
-                                      width: 40,
-                                      height: 40,
-                                      margin: EdgeInsets.only(left: 20, right: 20),
-                                      decoration: BoxDecoration(
-                                        color: Color(0xffF5F3C1),
-                                        border: Border.all(
-                                          color: Color(0xff270564),
-                                          width: 3
-                                        ),
-                                        borderRadius: BorderRadius.circular(8)
+                        child: SizedBox(
+                        height: 592,
+                        child: 
+                          ListView.builder(
+                        itemCount: Todos.myTodos.length,
+                        itemBuilder: (BuildContext context, int index) {
+                        return Container(
+                          margin: EdgeInsets.only(top: 10),
+                          padding: EdgeInsets.only(right: 15),
+                          width: MediaQuery.of(context).size.width -30,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            color: Color(0xff0EA293),
+                            borderRadius: BorderRadius.circular(9),
+                          ),
+                          child: Row(
+                              // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    if(Todos.myTodos[index].isDone == true){
+                                        setState(() {
+                                          Todos.myTodos[index].isDone = false;
+                                        });
+                                        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('na tap mo na bobo $isDone' )));
+                                      }else{
+                                        setState(() {
+                                          Todos.myTodos[index].isDone = true;
+                                        });
+                                        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('na tap mo na bobo $isDone' )));
+                                      }
+                                    
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 700),
+                                    width: 40,
+                                    height: 40,
+                                    margin: EdgeInsets.only(left: 20, right: 20),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xffF5F3C1),
+                                      border: Border.all(
+                                        color: Color(0xff270564),
+                                        width: 3
                                       ),
-                                      child: 
-                                      Todos.myTodos[index].isDone ? 
-                                      Icon(
-                                        Icons.check, 
-                                        size: 30,
-                                        color: Color(0xff27E1C1),)
-                                        : null,
+                                      borderRadius: BorderRadius.circular(8)
                                     ),
+                                    child: 
+                                    Todos.myTodos[index].isDone ? 
+                                    const Icon(
+                                      Icons.check, 
+                                      size: 30,
+                                      color: Color(0xff27E1C1),)
+                                      : null,
                                   ),
-                                  Expanded(
-                                    child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(truncateText(Todos.myTodos[index].doThis, 26),
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontFamily: 'Poppins',
-                                    color: Color(0xffF5F3C1),
-                                  ),),
-                                  Text('${Todos.myTodos[index].whatTimehr}:${Todos.myTodos[index].whatTimemin}',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 19,
-                                    color: Color(0xff27E1C1)
-                                  ), )
-                                    ],
-                                  ))
-                                ],
+                                ),
+                                Expanded(
+                                  child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(truncateText(Todos.myTodos[index].doThis, 26),
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontFamily: 'Poppins',
+                                  color: Color(0xffF5F3C1),
+                                ),),
+                                Text('${Todos.myTodos[index].whatTimehr}:${Todos.myTodos[index].whatTimemin}',
+                                style: const TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 19,
+                                  color: Color(0xff27E1C1)
+                                ), )
+                                  ],
+                                ))
+                              ],
+                          ),
+                        );
+                            })
                             ),
-                          );
-                        })
-                          ,
-                        ),
                         ),
                     ),
                 ]
@@ -217,4 +227,14 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
         ),
     );
   }
+
+  void _showAddTask(BuildContext context) async {
+    final result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AddTask();
+      },
+    );
+  }
+
 }
