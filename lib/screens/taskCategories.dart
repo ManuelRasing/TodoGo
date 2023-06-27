@@ -47,8 +47,9 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
   
     return Scaffold(
       backgroundColor: Color(0xffF5F3C1),
-      body: Padding(
-        padding: EdgeInsets.only(top: 70), 
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        padding: EdgeInsets.only(top: 30), 
         child: 
         Column(
           children: [
@@ -99,9 +100,9 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
             ),
             Container(
               width: MediaQuery.of(context).size.width,
-              height: 664,
+              height: (MediaQuery.of(context).size.height * 0.75) - 2.5,
               margin: EdgeInsets.only(top: 30),
-              padding: EdgeInsets.fromLTRB(15, 30, 15, 5),
+              padding: EdgeInsets.fromLTRB(15, 10, 15, 5),
               decoration: const BoxDecoration(
                 color: Color(0xff27E1C1),
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(55), topRight: Radius.circular(55))
@@ -123,7 +124,6 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
                     child: GestureDetector(
                       onTap: () {
                         addClicked = true;
-                        print('tapped');
                         _showAddTask(context);
                       },
                       child: Image.asset('assets/images/add_task.png',
@@ -133,12 +133,12 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
                   )
                     ],
                   ),
-                  Container(
-                    height: 592,
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.63,
                     child: SingleChildScrollView(
                       scrollDirection: Axis.vertical,
                         child: SizedBox(
-                        height: 592,
+                        height: MediaQuery.of(context).size.height * 0.63,
                         child: 
                           ListView.builder(
                         itemCount: Todos.myTodos.length,
@@ -157,18 +157,10 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    if(Todos.myTodos[index].isDone == true){
-                                        setState(() {
-                                          Todos.myTodos[index].isDone = false;
-                                        });
-                                        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('na tap mo na bobo $isDone' )));
-                                      }else{
-                                        setState(() {
-                                          Todos.myTodos[index].isDone = true;
-                                        });
-                                        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('na tap mo na bobo $isDone' )));
-                                      }
-                                    
+                                    setState(() {
+                                      Todos.myTodos[index].isDone = ! Todos.myTodos[index].isDone;
+                                    });
+                                  
                                   },
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 700),
@@ -196,7 +188,7 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
                                   child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(truncateText(Todos.myTodos[index].doThis, 26),
+                                    Text(truncateText(Todos.myTodos[index].doThis, 20),
                                 style: const TextStyle(
                                   fontSize: 20,
                                   fontFamily: 'Poppins',

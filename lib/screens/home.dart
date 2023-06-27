@@ -88,7 +88,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 dayOrNight = 'assets/images/autumn.png';
             } 
     });
-    print(formattedTime);
     fetchData().then((response) {
       setState(() {
         quote = response;
@@ -97,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
           getContainerSize();
           categoryHeight = containerSize?.height;
           catHeight = MediaQuery.of(context).size.height - categoryHeight!.toDouble();
-          catHeight = catHeight - 245;
+          catHeight = catHeight - 247;
         });
       
     }).catchError((error) {
@@ -217,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Container(
-              padding: EdgeInsets.fromLTRB(25, 30, 0, 0),
+              padding: EdgeInsets.fromLTRB(15, 30, 0, 0),
               alignment: Alignment.centerLeft,
               child: Text(
                 'Task Categories',
@@ -230,12 +229,12 @@ class _MyHomePageState extends State<MyHomePage> {
             Divider(
               color: Color(0xff0EA293),
               thickness: 1.0,
-              indent: 25.0,
-              endIndent: 25.0,
+              indent: 15.0,
+              endIndent: 15.0,
             ),
             Padding(
               padding: EdgeInsets.only(
-                  left: 25.0, right: 25.0), // Set the desired padding
+                  left: 15.0, right: 15.0), // Set the desired padding
               child: SingleChildScrollView(
                 child: Container(
                   height: catHeight, // Set the desired height of the container
@@ -341,7 +340,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                truncateText(taskCategories[index].categoryTitle, 9),
+                                                truncateText(taskCategories[index].categoryTitle, 7),
                                                 style: const TextStyle(
                                                   color: Color(0xff270564),
                                                   fontSize: 18,

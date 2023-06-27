@@ -39,6 +39,7 @@ dependencies:
   http: ^0.13.6
   intl: ^0.18.1
   flutter_gifimage: ^1.0.1
+  wheel_chooser: ^1.1.2
 
 dev_dependencies:
   flutter_test:
@@ -107,6 +108,8 @@ flutter:
         - asset: assets/fonts/Poppins-Regular.ttf
         - asset: assets/fonts/Poppins-Bold.ttf
           weight: 600
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 500
  
   #   - family: Trajan Pro
   #     fonts:
