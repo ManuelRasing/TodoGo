@@ -1,8 +1,15 @@
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'screens/home.dart';
+import 'package:get/get.dart';
+import 'package:todo_app/auth/authRepository.dart';
+import 'package:todo_app/firebase_options.dart';
+import 'package:todo_app/screens/taskCategories.dart';
 
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform).then((value) => Get.put(AuthRepository()));
   runApp(const MyApp());
   
 }
@@ -12,9 +19,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const GetMaterialApp(
       title: 'Todo Go',
-      home: MyHomePage(),
+      defaultTransition: Transition.leftToRightWithFade,
+      transitionDuration: Duration(milliseconds: 500),
+      home: 
+      CircularProgressIndicator(),
     );
   }
+}
+Route homepageToToDoPage() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => const Category(),
+    transitionDuration: const Duration(milliseconds: 500),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0);
+      const end = Offset.zero;
+      const curve = Curves.easeInOut;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }
