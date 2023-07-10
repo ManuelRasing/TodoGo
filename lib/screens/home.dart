@@ -9,7 +9,6 @@ import 'package:todo_app/auth/taskCatController.dart';
 import 'package:todo_app/auth/userController.dart';
 import 'package:todo_app/models/userModel.dart';
 import 'package:todo_app/screens/addCategory.dart';
-import 'package:todo_app/screens/taskCategories.dart';
 import 'dart:convert';
 
 import '../main.dart';
@@ -38,6 +37,8 @@ Future<String> fetchData() async {
 
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -54,9 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var formattedTime;
   String timeOfTheDay = '';
   String dayOrNight = '';
-  Timer? _timer;
   
-
   final categoryList = <int>[1,2,3,4,5,6,7,8,9,10];
 
   
@@ -107,13 +106,14 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
+  
+
   @override
   Widget build(BuildContext context) {
     
   final controller = Get.put(UserController());
   final taskController = Get.put(TaskCatController());
-  
-  
+
   String truncateText(String text, int maxLength) {
   if (text.length <= maxLength) {
     return text;
@@ -124,14 +124,14 @@ class _MyHomePageState extends State<MyHomePage> {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     
     return Scaffold(
-      backgroundColor: Color(0xffF5F3C1),
+      backgroundColor: const Color(0xffF5F3C1),
       body: Column(
           children: [
             Stack(
               children: 
                 [
                   Container(
-                    margin: EdgeInsets.only(top: 30),
+                    margin: const EdgeInsets.only(top: 30),
                     child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -175,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 }else if(snapshot.hasError){
                                   return Text(snapshot.error.toString());
                                 }else{
-                                  return Text('Something went wrong');
+                                  return const Text('Something went wrong');
                                 }
                                 
                              }else{
@@ -201,8 +201,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 1,
-                      padding: EdgeInsets.all(0),
-                      backgroundColor: Color(0xffD9D7A9),
+                      padding: const EdgeInsets.all(0),
+                      backgroundColor: const Color(0xffD9D7A9),
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(topLeft: Radius.circular(25), bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25))
                       )
@@ -223,25 +223,25 @@ class _MyHomePageState extends State<MyHomePage> {
               key: containerKey,
               width: MediaQuery.of(context).size.width - 30,
               alignment: Alignment.center,
-              padding: EdgeInsets.fromLTRB(5, 20, 5, 20),
+              padding: const EdgeInsets.fromLTRB(5, 20, 5, 20),
               decoration: BoxDecoration(
-                  color: Color.fromARGB(131, 14, 162, 147),
+                  color: const Color.fromARGB(131, 14, 162, 147),
                   border: Border.all(
-                      color: Color.fromARGB(131, 14, 162, 147), width: 1.0),
+                      color: const Color.fromARGB(131, 14, 162, 147), width: 1.0),
                   borderRadius: BorderRadius.circular(15)),
               child: Text(
-                '"\ $quote \"',
+                '" $quote "',
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 20,
                     fontFamily: 'PatrickHand',
                     color: Color(0xff270564)),
               ),
             ),
             Container(
-              padding: EdgeInsets.fromLTRB(15, 30, 0, 0),
+              padding: const EdgeInsets.fromLTRB(15, 30, 0, 0),
               alignment: Alignment.centerLeft,
-              child: Text(
+              child: const Text(
                 'Task Categories',
                 style: TextStyle(
                     fontFamily: 'Anton',
@@ -249,14 +249,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     fontSize: 20),
               ),
             ),
-            Divider(
+            const Divider(
               color: Color(0xff0EA293),
               thickness: 1.0,
               indent: 15.0,
               endIndent: 15.0,
             ),
             Padding(
-              padding: EdgeInsets.only(
+              padding: const EdgeInsets.only(
                   left: 15.0, right: 15.0), // Set the desired padding
               child: SingleChildScrollView(
                 child: Container(
@@ -310,15 +310,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                             default:
                                               catIcon;
                                           }
-                                          return Padding(padding: EdgeInsets.all(5),
-                                        child: InkWell(
+                                          return Padding(padding: const EdgeInsets.all(5),
+                                        child: GestureDetector(
                                           onTap: () {
-                                            Navigator.of(context).push(homepageToToDoPage());
+                                            Navigator.of(context).push(homepageToToDoPage(snapshot.data![index].categoryTitle.toString()));
+                                          },
+                                          onLongPress: () {
+                                            _editDeleteCat(context, snapshot.data![index].categoryTitle);
                                           },
                                           child: Container(
-                                                    padding: EdgeInsets.fromLTRB(5, 20, 5, 0),
+                                                    padding: const EdgeInsets.fromLTRB(5, 20, 5, 0),
                                                     decoration: BoxDecoration(
-                                                        color: Color(0xff27E1C1),
+                                                        color: const Color(0xff27E1C1),
                                                         boxShadow: [
                                                           BoxShadow(
                                                             color: Colors.grey.withOpacity(0.5),
@@ -328,12 +331,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           )
                                                         ],
                                                         border: Border.all(
-                                                            color: Color(0xff27E1C1), width: 1.0),
+                                                            color: const Color(0xff27E1C1), width: 1.0),
                                                         borderRadius: BorderRadius.circular(15)),
                                                     child: Column(
                                                       mainAxisAlignment:
                                                           MainAxisAlignment.spaceEvenly,
                                                       children: [
+                                                        // isLongPressed ? null : _editDeleteCat(),
                                                         Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment.spaceEvenly,
@@ -358,7 +362,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                     fontWeight: FontWeight.w600,
                                                                   ),
                                                                 ),
-                                                                Text('Task',
+                                                                const Text('Task',
                                                                     style: TextStyle(
                                                                       color: Color(0xff270564),
                                                                       fontSize: 18,
@@ -379,7 +383,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                 width: 25,
                                                                 height: 25,
                                                               ),
-                                                              Text(
+                                                              const Text(
                                                                 '20 Tasks',
                                                                 style: TextStyle(
                                                                     fontSize: 18,
@@ -393,17 +397,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     ),),
                                         ),);
                                       }),
-                                      Padding(padding: EdgeInsets.all(5),
+                                      Padding(padding: const EdgeInsets.all(5),
                                         child: InkWell(
                                           onTap: () {
                                             _showAddCategory(context);
                                           },
+                                          
                                           child: Container(
-                                                    padding: EdgeInsets.fromLTRB(5, 20, 5, 0),
+                                                    padding: const EdgeInsets.fromLTRB(5, 20, 5, 0),
                                                     decoration: BoxDecoration(
-                                                        color: Color(0xff27E1C1),
+                                                        color: const Color(0xff27E1C1),
                                                         border: Border.all(
-                                                            color: Color(0xff27E1C1), width: 1.0),
+                                                            color: const Color(0xff27E1C1), width: 1.0),
                                                         boxShadow: [
                                                           BoxShadow(
                                                             color: Colors.grey.withOpacity(0.5),
@@ -422,7 +427,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                               height: 50,
                                                               width: 50,
                                                             ),
-                                                            Column(
+                                                            const Column(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment.start,
                                                               crossAxisAlignment:
@@ -431,7 +436,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                 Text(
                                                                   'Add New\nTask',
                                                                   textAlign: TextAlign.center,
-                                                                  style: const TextStyle(
+                                                                  style: TextStyle(
                                                                     color: Color(0xff270564),
                                                                     fontSize: 18,
                                                                     fontFamily: 'Poppins',
@@ -465,11 +470,25 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
     void _showAddCategory(BuildContext context) async {
-    final result = await showDialog(
+     await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AddCategory();
+        return const AddCategory();
       },
     );
+  }
+    
+    
+    _editDeleteCat(BuildContext context, String categoryName ) async{
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) { 
+        return EditCategory(categoryName: categoryName);
+        } ,
+    ).then((value) {
+      setState(() {
+      });
+    });
+
   }
 }

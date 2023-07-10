@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:todo_app/auth/taskCatController.dart';
 
 class AddCategory extends StatefulWidget {
-  AddCategory({Key? key}) : super(key: key);
+  const AddCategory({Key? key}) : super(key: key);
 
   @override
   State<AddCategory> createState() => _AddCategoryState();
@@ -18,8 +18,8 @@ class _AddCategoryState extends State<AddCategory> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Color(0xffF5F3C1),
-      content: Container(
+      backgroundColor: const Color(0xffF5F3C1),
+      content: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: 150,
         child: Column(
@@ -29,7 +29,7 @@ class _AddCategoryState extends State<AddCategory> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Add Category.',
+                const Text('Add Category.',
                 style: TextStyle(
                   fontFamily: 'aAkhirTahun',
                   fontSize: 20,
@@ -40,7 +40,7 @@ class _AddCategoryState extends State<AddCategory> {
                     Navigator.of(context).pop();
                   },
                   child: Container(
-                    margin: EdgeInsets.only(left: 10,),
+                    margin: const EdgeInsets.only(left: 10,),
                     child: Image.asset('assets/images/cancel.png',
                     height: 30,
                     width: 30,),
@@ -49,7 +49,7 @@ class _AddCategoryState extends State<AddCategory> {
               ],
             ),
             TextField(
-                cursorColor: Color(0xff270564),
+                cursorColor: const Color(0xff270564),
                 textCapitalization: TextCapitalization.sentences,
                 style: const TextStyle(
                   fontFamily: 'Poppins',
@@ -77,13 +77,13 @@ class _AddCategoryState extends State<AddCategory> {
                 if(context.mounted){
                   controller.addCatController.clear();
                   Navigator.of(context).pop();
-                  };
+                  }
               }, 
               style: ElevatedButton.styleFrom(
                 elevation: 10,
-                shadowColor: Color(0xff270564),
-                backgroundColor: Color(0xff27E1C1),
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 36),
+                shadowColor: const Color(0xff270564),
+                backgroundColor: const Color(0xff27E1C1),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 36),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4)
                 ),
@@ -103,25 +103,151 @@ class _AddCategoryState extends State<AddCategory> {
 }
 
 class EditCategory extends StatefulWidget {
-  EditCategory({Key? key}) : super(key: key);
-
+  final categoryName;
+  const EditCategory({super.key, required this.categoryName,});
   @override
+  
   State<EditCategory> createState() => _EditCategoryState();
 }
 
 class _EditCategoryState extends State<EditCategory> {
+    final controller = Get.put(TaskCatController());
 
   bool isEdit = false;
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Color(0xffF5F3C1),
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      backgroundColor: const Color(0xffF5F3C1),
       content: AnimatedContainer(
-        duration: Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 300),
         width: MediaQuery.of(context).size.width,
-        color: Color(0xffF5F3C1),
+        height: isEdit ? 150 : 100,
+        color:const Color(0xffF5F3C1),
         child: Column(
-          
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                 const Text('Task Category: ',
+            style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xff270564),
+                ),
+              ),
+              Text(widget.categoryName,
+            style: const TextStyle(
+                  fontFamily: 'aAkhirTahun',
+                  fontSize: 24,
+                  color: Color(0xff270564),
+                ),
+              ),
+                ],
+              ),
+              AnimatedScale(
+                scale: isEdit ? 1 : 0, 
+                duration: const Duration(milliseconds: 300),
+                child: TextField(
+                cursorColor: const Color(0xff270564),
+                textCapitalization: TextCapitalization.sentences,
+                style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 18,
+                  color: Color(0xff270564)
+                ),
+                controller: controller.editCatController,
+                decoration: InputDecoration(
+                  hintText: widget.categoryName,
+                  hintStyle: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 18,
+                    color: Color.fromARGB(123, 38, 5, 100),
+                    
+                  ),
+                  border: InputBorder.none,
+                  filled: true,
+                  fillColor: const Color(0xffD9D7A9)
+                ),
+                
+              ),
+                ),
+
+              AnimatedSlide(
+                duration: const Duration(milliseconds: 300),
+                offset: isEdit ? const Offset(0, 0):const Offset(0, -0.75),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async{
+                        if(isEdit == true){
+                          await TaskCatController.instance.editCategory(widget.categoryName ,controller.editCatController.text.trim(), isEdit);
+                        if(context.mounted){
+                          controller.addCatController.clear();
+                          Navigator.of(context).pop();
+                          }
+                        }
+                        setState(() {
+                          isEdit = true;
+                        });
+                      }, 
+                      style: ElevatedButton.styleFrom(
+                        elevation: 10,
+                        shadowColor: const Color(0xff270564),
+                        backgroundColor: const Color(0xff27E1C1),
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 36),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4)
+                        ),
+                      ),
+                      child: Text(isEdit ? 'Save' :'Edit',
+                      style: const TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: Color(0xff270564),
+                      ),)),
+                    ElevatedButton(
+                      onPressed: () async{
+                        if(isEdit == true){
+                          setState(() {
+                          isEdit = false;
+                        });
+                        } else{
+                          await TaskCatController.instance.editCategory(widget.categoryName ,controller.editCatController.text.trim(), isEdit);
+                          
+                        }
+                        if(context.mounted){
+                            Navigator.of(context).pop();
+                        }
+                        setState(() {
+                          controller.addCatController.clear();
+                        });
+                      }, 
+                      style: ElevatedButton.styleFrom(
+                        elevation: 10,
+                        shadowColor: const Color(0xff27E1C1),
+                        backgroundColor: const Color(0xff270564),
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 28),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4)
+                        ),
+                      ),
+                      child: Text(isEdit ? 'Cancel' :'Delete',
+                      style: const TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: Color(0xff27E1C1),
+                      ),)),
+                  ],
+                ),
+              )
+          ],
         ),
         ),
     );

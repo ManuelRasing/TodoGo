@@ -1,9 +1,6 @@
-import 'dart:ffi';
 
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:todo_app/models/taskCategory.dart';
 import 'package:wheel_chooser/wheel_chooser.dart';
 
 class AddTask extends StatefulWidget {
@@ -24,16 +21,16 @@ class _AddTaskState extends State<AddTask> {
     String _timeOfDay = '';
     String _mon = '';
     String _day = '';
-    String _year = '';
+    final String _year = '';
 
 
   int daysInMonth = 0;
-  String _taskTime = "00";
-  List<String> _taskhr = [];
-  List<String> _taskmin = [];
-  List<String> _taskmon = [];
-  List<String> _taskday = [];
-  List<String> _taskyear = [];
+  final String _taskTime = "00";
+  final List<String> _taskhr = [];
+  final List<String> _taskmin = [];
+  final List<String> _taskmon = [];
+  final List<String> _taskday = [];
+  final List<String> _taskyear = [];
 
   var _amPm = 0;
   @override
@@ -82,6 +79,7 @@ class _AddTaskState extends State<AddTask> {
   }
     super.initState();
   }
+  @override
   void dispose() {
     taskController.dispose();
     super.dispose();
@@ -95,8 +93,8 @@ class _AddTaskState extends State<AddTask> {
         borderRadius: BorderRadius.circular(15)
       ),
       insetPadding: EdgeInsets.zero,
-      contentPadding: EdgeInsets.all(15),
-      backgroundColor: Color(0xffF5F3C1),
+      contentPadding: const EdgeInsets.all(15),
+      backgroundColor: const Color(0xffF5F3C1),
       content: Container(
         // width: MediaQuery.of(context).size.width - 100,
         height: 300,
@@ -127,7 +125,7 @@ class _AddTaskState extends State<AddTask> {
                     Navigator.of(context).pop();
                   },
                   child: Container(
-                    margin: EdgeInsets.only(left: 10,),
+                    margin: const EdgeInsets.only(left: 10,),
                     child: Image.asset('assets/images/cancel.png',
                     height: 30,
                     width: 30,),
@@ -136,10 +134,10 @@ class _AddTaskState extends State<AddTask> {
               ],
             ),
             Container(
-              margin: EdgeInsets.only(top: 15, bottom: 15),
+              margin: const EdgeInsets.only(top: 15, bottom: 15),
               child: TextField(
                 maxLines: 5,
-                cursorColor: Color(0xff270564),
+                cursorColor: const Color(0xff270564),
                 textCapitalization: TextCapitalization.sentences,
                 style: const TextStyle(
                   fontFamily: 'Poppins',
@@ -170,7 +168,7 @@ class _AddTaskState extends State<AddTask> {
               color: Color(0xff270564)
             ),),
             Container(
-              color: Color(0xffD9D7A9),
+              color: const Color(0xffD9D7A9),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

@@ -1,13 +1,12 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'dart:async';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:todo_app/models/todos.dart';
+import 'package:todo_app/auth/TodosController/todoController.dart';
 import 'package:todo_app/screens/addtask_widget.dart';
 
 class Category extends StatefulWidget {
-  const Category({super.key});
+  final categoryName;
+  const Category({super.key, required this.categoryName});
   
   @override
   State<Category> createState() => _CategoryState();
@@ -30,11 +29,11 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
   @override
   Widget build(BuildContext context) {
 
+  final todoController = Get.put(TodoController());
   String  formattedMonth = DateFormat('MMM').format(dateNow);
   String  formattedDay = DateFormat('dd').format(dateNow);
   String  formattedYear = DateFormat('yyyy').format(dateNow);
 
-  bool addClicked = false;
 
   String truncateText(String text, int maxLength) {
   if (text.length <= maxLength) {
@@ -46,10 +45,10 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
   
   
     return Scaffold(
-      backgroundColor: Color(0xffF5F3C1),
+      backgroundColor: const Color(0xffF5F3C1),
       body: Container(
         height: MediaQuery.of(context).size.height,
-        padding: EdgeInsets.only(top: 30), 
+        padding: const EdgeInsets.only(top: 30), 
         child: 
         Column(
           children: [
@@ -59,10 +58,10 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
               children: [
                 Container(
                   decoration: BoxDecoration(
-                  color: Color(0xff0EA293),
+                  color: const Color(0xff0EA293),
                   borderRadius: BorderRadius.circular(5)
                   ),
-                  padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
+                  padding: const EdgeInsets.fromLTRB(25, 10, 25, 10),
                   child: Column(
                     children: [
                       Text( 
@@ -90,7 +89,7 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
                     ],
                   ),
                 ),
-                Text('Personal Task',
+                const Text('Personal Task',
                 style: TextStyle(
                   fontFamily: 'Anton',
                   color: Color(0xff0EA293),
@@ -101,8 +100,8 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
             Container(
               width: MediaQuery.of(context).size.width,
               height: (MediaQuery.of(context).size.height * 0.75) - 2.5,
-              margin: EdgeInsets.only(top: 30),
-              padding: EdgeInsets.fromLTRB(15, 10, 15, 5),
+              margin: const EdgeInsets.only(top: 30),
+              padding: const EdgeInsets.fromLTRB(15, 10, 15, 5),
               decoration: const BoxDecoration(
                 color: Color(0xff27E1C1),
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(55), topRight: Radius.circular(55))
@@ -120,10 +119,9 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
                         color: Color(0xff0EA293),
                   ),),
                   Container(
-                    margin: EdgeInsets.only(left: 90, right: 30),
+                    margin: const EdgeInsets.only(left: 90, right: 30),
                     child: GestureDetector(
                       onTap: () {
-                        addClicked = true;
                         _showAddTask(context);
                       },
                       child: Image.asset('assets/images/add_task.png',
@@ -140,72 +138,90 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
                         child: SizedBox(
                         height: MediaQuery.of(context).size.height * 0.63,
                         child: 
-                          ListView.builder(
-                        itemCount: Todos.myTodos.length,
-                        itemBuilder: (BuildContext context, int index) {
-                        return Container(
-                          margin: EdgeInsets.only(top: 10),
-                          padding: EdgeInsets.only(right: 15),
-                          width: MediaQuery.of(context).size.width -30,
-                          height: 70,
-                          decoration: BoxDecoration(
-                            color: Color(0xff0EA293),
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                          child: Row(
-                              // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      Todos.myTodos[index].isDone = ! Todos.myTodos[index].isDone;
-                                    });
-                                  
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 700),
-                                    width: 40,
-                                    height: 40,
-                                    margin: EdgeInsets.only(left: 20, right: 20),
-                                    decoration: BoxDecoration(
-                                      color: Color(0xffF5F3C1),
-                                      border: Border.all(
-                                        color: Color(0xff270564),
-                                        width: 3
-                                      ),
-                                      borderRadius: BorderRadius.circular(8)
-                                    ),
-                                    child: 
-                                    Todos.myTodos[index].isDone ? 
-                                    const Icon(
-                                      Icons.check, 
-                                      size: 30,
-                                      color: Color(0xff27E1C1),)
-                                      : null,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(truncateText(Todos.myTodos[index].doThis, 20),
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontFamily: 'Poppins',
-                                  color: Color(0xffF5F3C1),
-                                ),),
-                                Text('${Todos.myTodos[index].whatTimehr}:${Todos.myTodos[index].whatTimemin}',
-                                style: const TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 19,
-                                  color: Color(0xff27E1C1)
-                                ), )
-                                  ],
-                                ))
-                              ],
-                          ),
-                        );
-                            })
+                          FutureBuilder(
+                            future: todoController.getAllTodos(widget.categoryName),
+                            builder: (context, snapshot) {
+                              if(snapshot.connectionState == ConnectionState.done){
+                                if(snapshot.hasData){
+                                  print('laman ${snapshot.data!}');
+                                  return ListView.builder(
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return Container(
+                                        margin: const EdgeInsets.only(top: 10),
+                                        padding: const EdgeInsets.only(right: 15),
+                                        width: MediaQuery.of(context).size.width -30,
+                                        height: 70,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xff0EA293),
+                                          borderRadius: BorderRadius.circular(9),
+                                        ),
+                                        child: Row(
+                                            // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    snapshot.data![index].isDone = ! snapshot.data![index].isDone;
+                                                  });
+                                                
+                                                },
+                                                child: AnimatedContainer(
+                                                  duration: const Duration(milliseconds: 700),
+                                                  width: 40,
+                                                  height: 40,
+                                                  margin: const EdgeInsets.only(left: 20, right: 20),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xffF5F3C1),
+                                                    border: Border.all(
+                                                      color: const Color(0xff270564),
+                                                      width: 3
+                                                    ),
+                                                    borderRadius: BorderRadius.circular(8)
+                                                  ),
+                                                  child: 
+                                                  snapshot.data![index].isDone ? 
+                                                  const Icon(
+                                                    Icons.check, 
+                                                    size: 30,
+                                                    color: Color(0xff27E1C1),)
+                                                    : null,
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(truncateText(snapshot.data![index].doThis, 20),
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                                fontFamily: 'Poppins',
+                                                color: Color(0xffF5F3C1),
+                                              ),),
+                                              Text('${snapshot.data![index].whatTimehr}:${snapshot.data![index].whatTimemin}',
+                                              style: const TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 19,
+                                                color: Color(0xff27E1C1)
+                                              ), )
+                                                ],
+                                              ))
+                                            ],
+                                        ),
+                                  );
+                                  }
+                              );
+                                }else if(snapshot.hasError){
+                                  return Text('${snapshot.error.toString()} \nPlease try again later.');
+                                }else{
+                                  return const Text('Something went wrong. \nPlease try again later.');
+                                }
+                              }else{
+                                return const CircularProgressIndicator();
+                              }
+                              
+                            }
+                          )
                             ),
                         ),
                     ),
@@ -221,10 +237,10 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin{
   }
 
   void _showAddTask(BuildContext context) async {
-    final result = await showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AddTask();
+        return const AddTask();
       },
     );
   }

@@ -28,9 +28,9 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-Route homepageToToDoPage() {
+Route homepageToToDoPage(categoryName) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => const Category(),
+    pageBuilder: (context, animation, secondaryAnimation) => Category(categoryName: categoryName,),
     transitionDuration: const Duration(milliseconds: 500),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 1.0);

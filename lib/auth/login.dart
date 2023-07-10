@@ -4,7 +4,7 @@ import 'package:todo_app/auth/authController.dart';
 import 'package:todo_app/models/userModel.dart';
 
 class loginPage extends StatefulWidget {
-  loginPage({Key? key}) : super(key: key);
+  const loginPage({Key? key}) : super(key: key);
 
   @override
   State<loginPage> createState() => _loginPageState();
@@ -24,7 +24,7 @@ class _loginPageState extends State<loginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffF5F3C1),
+      backgroundColor: const Color(0xffF5F3C1),
       body: Container(
         width: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
@@ -48,8 +48,8 @@ class _loginPageState extends State<loginPage> {
               color: Color(0xBE270564)
             ),),
              AnimatedPadding(
-              padding: signUp ? EdgeInsets.only(top:25, bottom: 0) : EdgeInsets.only(top: 50, bottom: 16),
-              duration: Duration(milliseconds: 500),
+              padding: signUp ? const EdgeInsets.only(top:25, bottom: 0) : const EdgeInsets.only(top: 50, bottom: 16),
+              duration: const Duration(milliseconds: 500),
               curve: Curves.easeInOut,
             child: Text(signUp ? 'Create an account:' : 'Continue with your account:',
             style: const TextStyle(
@@ -60,19 +60,19 @@ class _loginPageState extends State<loginPage> {
             
             AnimatedScale(
               scale: signUp ? 1.0:0.0,
-              duration: Duration(milliseconds: 500),
+              duration: const Duration(milliseconds: 500),
               curve: Curves.easeInOut,
               child: Container(
-                margin: EdgeInsets.only(top: 16, bottom: 8),
+                margin: const EdgeInsets.only(top: 16, bottom: 8),
                 child: Stack(
                   children: 
                     [
                       Container(
-                      margin: EdgeInsets.only(top: 8),
+                      margin: const EdgeInsets.only(top: 8),
                       height: 64,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xff270564),
+                        border: Border.all(color: const Color(0xff270564),
                         width: 4),
                         borderRadius: BorderRadius.circular(8)
                 
@@ -87,7 +87,7 @@ class _loginPageState extends State<loginPage> {
                           fontFamily: 'Poppins',
                           fontSize: 20,
                         ),
-                        cursorColor: Color(0xff27E1C1),
+                        cursorColor: const Color(0xff27E1C1),
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.only(left: 12),
@@ -99,9 +99,9 @@ class _loginPageState extends State<loginPage> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(left: 12),
-                      padding: EdgeInsets.only(left: 5, right: 5),
-                      color: Color(0xffF5F3C1),
+                      margin: const EdgeInsets.only(left: 12),
+                      padding: const EdgeInsets.only(left: 5, right: 5),
+                      color: const Color(0xffF5F3C1),
                       child: const Text("Username",
                       style: TextStyle(
                         fontFamily: "Montserrat",
@@ -116,20 +116,20 @@ class _loginPageState extends State<loginPage> {
               ),
 
             AnimatedSlide(
-              offset: signUp ? Offset(0, 0): Offset(0, -1), 
-              duration: Duration(milliseconds: 600),
+              offset: signUp ? const Offset(0, 0): const Offset(0, -1), 
+              duration: const Duration(milliseconds: 600),
               curve: Curves.easeInOut,
               child: Container(
-                margin: EdgeInsets.only(top: 16, bottom: 8),
+                margin: const EdgeInsets.only(top: 16, bottom: 8),
                 child: Stack(
                   children: 
                     [
                       Container(
-                      margin: EdgeInsets.only(top: 8),
+                      margin: const EdgeInsets.only(top: 8),
                       height: 64,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xff270564),
+                        border: Border.all(color: const Color(0xff270564),
                         width: 4),
                         borderRadius: BorderRadius.circular(8)
                 
@@ -138,12 +138,12 @@ class _loginPageState extends State<loginPage> {
                         keyboardType: TextInputType.emailAddress,
                         controller: controllers.email,
                         textAlignVertical: TextAlignVertical.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 20,
                         ),
-                        cursorColor: Color(0xff27E1C1),
-                        decoration: InputDecoration(
+                        cursorColor: const Color(0xff27E1C1),
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.only(left: 12),
                           hintText: 'juandelacruz@email.com',
@@ -154,9 +154,9 @@ class _loginPageState extends State<loginPage> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(left: 12),
-                      padding: EdgeInsets.only(left: 5, right: 5),
-                      color: Color(0xffF5F3C1),
+                      margin: const EdgeInsets.only(left: 12),
+                      padding: const EdgeInsets.only(left: 5, right: 5),
+                      color: const Color(0xffF5F3C1),
                       child: const Text("Email",
                       style: TextStyle(
                         fontFamily: "Montserrat",
@@ -173,20 +173,20 @@ class _loginPageState extends State<loginPage> {
 
 
             AnimatedSlide(
-              offset: signUp ? Offset(0, 0): Offset(0, -1), 
-              duration: Duration(milliseconds: 600),
+              offset: signUp ? const Offset(0, 0): const Offset(0, -1), 
+              duration: const Duration(milliseconds: 600),
               curve: Curves.easeInOut,
               child: Container(
-                margin: EdgeInsets.only(top: 16, bottom: 8),
+                margin: const EdgeInsets.only(top: 16, bottom: 8),
                 child: Stack(
                   children: 
                     [
                       Container(
-                      margin: EdgeInsets.only(top: 8),
+                      margin: const EdgeInsets.only(top: 8),
                       height: 64,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xff270564),
+                        border: Border.all(color: const Color(0xff270564),
                         width: 4),
                         borderRadius: BorderRadius.circular(8)
                 
@@ -196,12 +196,12 @@ class _loginPageState extends State<loginPage> {
                         keyboardType: TextInputType.visiblePassword,
                         controller: controllers.password,
                         textAlignVertical: TextAlignVertical.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 20,
                         ),
-                        cursorColor: Color(0xff27E1C1),
-                        decoration: InputDecoration(
+                        cursorColor: const Color(0xff27E1C1),
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.only(left: 12),
                           hintText: 'your password...',
@@ -212,9 +212,9 @@ class _loginPageState extends State<loginPage> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(left: 12),
-                      padding: EdgeInsets.only(left: 5, right: 5),
-                      color: Color(0xffF5F3C1),
+                      margin: const EdgeInsets.only(left: 12),
+                      padding: const EdgeInsets.only(left: 5, right: 5),
+                      color: const Color(0xffF5F3C1),
                       child: const Text("Password",
                       style: TextStyle(
                         fontFamily: "Montserrat",
@@ -230,14 +230,14 @@ class _loginPageState extends State<loginPage> {
 
               Container(
                 width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.symmetric(horizontal: 32),
-                margin: EdgeInsets.only(top: 16, bottom: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                margin: const EdgeInsets.only(top: 16, bottom: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
                       signUp ? "Already have an account?": "Don’t have an account?" ,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 16,
                       color: Color(0xff270564)
@@ -251,7 +251,7 @@ class _loginPageState extends State<loginPage> {
                         print(signUp);
                       },
                       child: Text(signUp ? "Log in":  "Sign up" ,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 16,
                         color: Color(0xff0EA293)
@@ -264,17 +264,19 @@ class _loginPageState extends State<loginPage> {
             ElevatedButton(
               onPressed: () {
                 signUp ? signup() : login();
+                Get.snackbar(signUp? 'Signing Up' : 'Logging in', 'Please wait.',
+                snackPosition: SnackPosition.TOP);
               }, 
               style: ElevatedButton.styleFrom(
                 
-                backgroundColor: Color(0xff27E1C1),
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 64),
+                backgroundColor: const Color(0xff27E1C1),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 64),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)
                 ),
               ),
               child: Text( signUp ? "Sign up" : "Login",
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Montserrat',
                 fontWeight: FontWeight.w600,
                 fontSize: 20,

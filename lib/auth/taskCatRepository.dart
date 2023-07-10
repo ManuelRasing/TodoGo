@@ -1,8 +1,9 @@
 
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:todo_app/models/taskCategory.dart';
 
 class TaskCatRepo extends GetxController{
@@ -10,25 +11,81 @@ class TaskCatRepo extends GetxController{
 
   
   final _userDb = FirebaseFirestore.instance.collection('Users');
+  DateTime dateNow = DateTime.now();
 
+  Future<void> createCategories(String userId) async {
+  final categories = [
+    'Personal',
+    'Health and Fitness',
+    'Educational',
+    'Work',
+    'Home',
+    'Finance',
+    'Shopping',
+    'Social',
+    'Hobbies',
+    'Travel',
+  ];
 
-  createCategories(userid) async{
-    await _userDb.doc(userid).collection('TaskCategories').doc('Personal').set({});
-    await _userDb.doc(userid).collection('TaskCategories').doc('Health and Fitness').set({});
-    await _userDb.doc(userid).collection('TaskCategories').doc('Educational').set({});
-    await _userDb.doc(userid).collection('TaskCategories').doc('Work').set({});
-    await _userDb.doc(userid).collection('TaskCategories').doc('Home').set({});
-    await _userDb.doc(userid).collection('TaskCategories').doc('Finance').set({});
-    await _userDb.doc(userid).collection('TaskCategories').doc('Shopping').set({});
-    await _userDb.doc(userid).collection('TaskCategories').doc('Social').set({});
-    await _userDb.doc(userid).collection('TaskCategories').doc('Hobbies').set({});
-    await _userDb.doc(userid).collection('TaskCategories').doc('Travel').set({});
+  try {
+    for (final category in categories) {
+      await _userDb
+          .doc(userId)
+          .collection('TaskCategories')
+          .doc(category).
+          set({})
+          .then((_) {
+          _userDb
+          .doc(userId)
+          .collection('TaskCategories')
+          .doc(category)
+          .collection('Todos')
+          .doc('Sample-todo')
+          .set({
+            'isDone': false,
+            'doThis': 'Make your first todo task.',
+            'whatTimehr': DateFormat('mm').format(dateNow).toString(),
+            'whatTimemin': DateFormat('hh').format(dateNow).toString(),
+            'whatDay': DateFormat('dd').format(dateNow).toString(),
+            'whatMonth': dateNow.month.toString(),
+            'whatYear': dateNow.year.toString(),
+          });
+          });
+          
+    }
+  } catch (_) {
+    // Handle any errors here
   }
+}
 
   addCategory(userid, String categoryName) async{
     try{
-      await _userDb.doc(userid).collection('TaskCategories').doc(categoryName).set({}).whenComplete(() {
+      await _userDb.doc(userid).collection('TaskCategories').doc(categoryName).collection('Todos').add({}).whenComplete(() {
       Get.snackbar('Success', 'Category added.',
+      snackPosition: SnackPosition.TOP);
+    });
+    }catch(_){
+      Get.snackbar('Error', 'Please try again.',
+      snackPosition: SnackPosition.TOP);
+    }
+  }
+  editCategory(userId, String categoryName, String newName) async{
+    try{
+      await _userDb.doc(userId).collection('TaskCategories').doc(categoryName).delete().whenComplete(() async{
+      await _userDb.doc(userId).collection('TaskCategories').doc(newName).collection('Todos').add({}).whenComplete(() {
+      Get.snackbar('Success', 'Category changed.',
+      snackPosition: SnackPosition.TOP);
+    });
+    });
+    }catch(_){
+      Get.snackbar('Error', 'Please try again.',
+      snackPosition: SnackPosition.TOP);
+    }
+  }
+  deleteCategory(userId, String categoryName) async{
+    try{
+      await _userDb.doc(userId).collection('TaskCategories').doc(categoryName).delete().whenComplete(() {
+      Get.snackbar('Success', 'Category deleted.',
       snackPosition: SnackPosition.TOP);
     });
     }catch(_){
@@ -40,6 +97,10 @@ class TaskCatRepo extends GetxController{
   Future<List<TaskCategory>> getCategories(userID) async{
     final snapshot = await _userDb.doc(userID).collection('TaskCategories').get();
     final userCategories = snapshot.docs.map((e) => TaskCategory.fromSnapshot(e)).toList();
+    print("$userID  \n$userCategories \n${snapshot.docs}");
     return userCategories;
   }
+
+
+ 
 }

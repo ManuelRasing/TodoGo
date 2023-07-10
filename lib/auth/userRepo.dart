@@ -1,6 +1,5 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/models/userModel.dart';
 import 'taskCatRepository.dart';
@@ -24,7 +23,7 @@ class UserRepo extends GetxController{
     }catch(_){
       Get.snackbar('Error', 'Please try again.',
       snackPosition: SnackPosition.TOP);
-    };
+    }
   }
 
   Future<UserModel> getUserInfo(String email) async{

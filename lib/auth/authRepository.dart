@@ -1,6 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/auth/authFailure.dart';
 import 'package:todo_app/auth/login.dart';
@@ -22,13 +20,13 @@ class AuthRepository extends GetxController{
   }
 
   _setInitialscreen(User? user){
-    user == null ? Get.offAll(loginPage()): Get.offAll(MyHomePage());
+    user == null ? Get.offAll(const loginPage()): Get.offAll(const MyHomePage());
   }
 
   Future<void> createUserWithEmailAndPassword(String email, String password) async{
     try{
       await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      firebaseUser.value != null ? Get.offAll(MyHomePage()) : Get.offAll(loginPage());
+      firebaseUser.value != null ? Get.offAll(const MyHomePage()) : Get.offAll(const loginPage());
     }on FirebaseAuthException catch(e){
       final ex = AuthFailure.code(e.code);
       print('FIREBASE AUTH EXCEPTION - ${ex.message}');
@@ -43,7 +41,7 @@ class AuthRepository extends GetxController{
   Future<void> loginUserWithEmailAndPassword(String email, String password) async{
     try{
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      firebaseUser.value != null ? Get.offAll(MyHomePage()) : Get.offAll(loginPage());
+      firebaseUser.value != null ? Get.offAll(const MyHomePage()) : Get.offAll(const loginPage());
     }on FirebaseAuthException catch(e){
       final ex = AuthFailure.code(e.code);
       print('FIREBASE AUTH EXCEPTION - ${ex.message}');
