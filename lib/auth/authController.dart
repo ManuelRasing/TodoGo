@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/auth/authRepository.dart';
@@ -18,16 +17,16 @@ class AuthController extends GetxController {
 
   createUser(UserModel user) async {
     await userRepo.createUser(user);
-    Future.delayed(const Duration(milliseconds: 1000), (){
+    Future.delayed(const Duration(milliseconds: 1500), () {
       registerUser(user.email, user.password);
     });
-    
   }
+
   void registerUser(String email, String password) {
     AuthRepository.instance.createUserWithEmailAndPassword(email, password);
   }
-  void loginUser(String email, String password){
+
+  void loginUser(String email, String password) {
     AuthRepository.instance.loginUserWithEmailAndPassword(email, password);
   }
-
 }

@@ -1,24 +1,36 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:get/get.dart';
 import 'package:todo_app/auth/TodosController/todoRepository.dart';
+import 'package:todo_app/auth/userController.dart';
 import 'package:todo_app/models/todos.dart';
 
-import '../authRepository.dart';
-
-class TodoController extends GetxController{
+class TodoController extends GetxController {
   static TodoController get instance => Get.find();
 
-  final _authRepo = Get.put(AuthRepository());
   final _todoRepo = Get.put(TodoRepository());
+  final _userController = Get.put(UserController());
 
-  final _db = FirebaseFirestore.instance.collection('Users');
+  final doThisController = TextEditingController();
+  final hrController = TextEditingController();
+  final minController = TextEditingController();
+  final dayController = TextEditingController();
+  final monController = TextEditingController();
+  final yearController = TextEditingController();
 
-  Future<List<Todos>> getAllTodos(categoryName) async{
-    final email = _authRepo.firebaseUser.value?.email;
-    QuerySnapshot snapshot = await _db.where('Email', isEqualTo: email).get();
-    String userID = snapshot.docs[0].id;
-    print('TODO CONTROLLER : $categoryName \n$userID');
-    return await _todoRepo.getAllTodos(userID, categoryName);
+  Future<List<Todos>> getAllTodos(categoryName) async {
+    final userID = await _userController.getUserID();
+    return _todoRepo.getAllTodos(userID, categoryName);
+  }
+
+  updateIsDone(categoryName, todoID, updatedVal, todo) async {
+    final userID = await _userController.getUserID();
+    return _todoRepo.isDone(userID, categoryName, todoID, updatedVal, todo);
+  }
+
+  addTodo(categoryName, doThis, hr, min, amPm, day, mon, year) async {
+    String userID = await _userController.getUserID();
+    return _todoRepo.addTodos(
+        userID, categoryName, doThis, hr, min, amPm, day, mon, year);
   }
 }
