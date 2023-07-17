@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:todo_app/auth/TodosController/todoController.dart';
 import 'package:todo_app/screens/addtask_widget.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import '../offline_database/database.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class Category extends StatefulWidget {
   final categoryName;
@@ -14,15 +16,34 @@ class Category extends StatefulWidget {
 
 class _CategoryState extends State<Category> with TickerProviderStateMixin {
   DateTime dateNow = DateTime.now();
-
-  // void initState(){
-
-  // }
-
+  final box = Hive.box('todogoBox');
+  var todogo;
+  var category;
+  var taskList = <Task>[];
   @override
+  void initState() {
+    todogo = box.get('todoGoUser');
+    category = todogo.categories
+        .firstWhere((category) => category.name == widget.categoryName);
+    if (category != null) {
+      for (var task in category.tasks) {
+        taskList.add(Task(
+            todos: task.todos,
+            isDone: task.isDone,
+            hour: task.hour,
+            minute: task.minute,
+            isAM: task.isAM,
+            day: task.day,
+            month: task.month,
+            year: task.year));
+      }
+    }
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final todoController = Get.put(TodoController());
     String formattedMonth = DateFormat('MMM').format(dateNow);
     String formattedDay = DateFormat('dd').format(dateNow);
     String formattedYear = DateFormat('yyyy').format(dateNow);
@@ -134,6 +155,7 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin {
                           child: GestureDetector(
                             onTap: () {
                               _showAddTask(context, widget.categoryName);
+                              taskList.clear();
                             },
                             child: Image.asset(
                               'assets/images/add_task.png',
@@ -150,148 +172,103 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin {
                         scrollDirection: Axis.vertical,
                         child: SizedBox(
                             height: MediaQuery.of(context).size.height * 0.63,
-                            child: FutureBuilder(
-                                future: todoController
-                                    .getAllTodos(widget.categoryName),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.done) {
-                                    if (snapshot.hasData) {
-                                      return ListView.builder(
-                                          itemCount: snapshot.data!.length,
-                                          itemBuilder: (BuildContext context,
-                                              int index) {
-                                            return Container(
-                                              margin: const EdgeInsets.only(
-                                                  top: 10),
-                                              padding: const EdgeInsets.only(
-                                                  right: 15),
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width -
-                                                  30,
-                                              height: 70,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xff0EA293),
+                            child: ListView.builder(
+                                itemCount: taskList.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Container(
+                                    margin: const EdgeInsets.only(top: 10),
+                                    padding: const EdgeInsets.only(right: 15),
+                                    width:
+                                        MediaQuery.of(context).size.width - 30,
+                                    height: 70,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xff0EA293),
+                                      borderRadius: BorderRadius.circular(9),
+                                    ),
+                                    child: Row(
+                                      // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              taskList[index].isDone =
+                                                  !taskList[index].isDone;
+                                            });
+                                          },
+                                          child: AnimatedContainer(
+                                            duration: const Duration(
+                                                milliseconds: 700),
+                                            width: 40,
+                                            height: 40,
+                                            margin: const EdgeInsets.only(
+                                                left: 20, right: 20),
+                                            decoration: BoxDecoration(
+                                                color: const Color(0xffF5F3C1),
+                                                border: Border.all(
+                                                    color:
+                                                        const Color(0xff270564),
+                                                    width: 3),
                                                 borderRadius:
-                                                    BorderRadius.circular(9),
-                                              ),
-                                              child: Row(
-                                                // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                children: [
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      todoController
-                                                          .updateIsDone(
-                                                              widget
-                                                                  .categoryName,
-                                                              snapshot
-                                                                  .data![index]
-                                                                  .todoId,
-                                                              !snapshot
-                                                                  .data![index]
-                                                                  .isDone,
-                                                              snapshot
-                                                                  .data![index]
-                                                                  .doThis)
-                                                          .then((_) {
-                                                        setState(() {});
-                                                      });
-                                                    },
-                                                    child: AnimatedContainer(
-                                                      duration: const Duration(
-                                                          milliseconds: 700),
-                                                      width: 40,
-                                                      height: 40,
-                                                      margin:
-                                                          const EdgeInsets.only(
-                                                              left: 20,
-                                                              right: 20),
-                                                      decoration: BoxDecoration(
-                                                          color: const Color(
-                                                              0xffF5F3C1),
-                                                          border: Border.all(
-                                                              color: const Color(
-                                                                  0xff270564),
-                                                              width: 3),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8)),
-                                                      child: snapshot
-                                                              .data![index]
-                                                              .isDone
-                                                          ? const Icon(
-                                                              Icons.check,
-                                                              size: 30,
-                                                              color: Color(
-                                                                  0xff27E1C1),
-                                                            )
-                                                          : null,
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: GestureDetector(
-                                                      onTap: () {
-                                                        _showEditTask(
-                                                            context,
-                                                            widget
-                                                                .categoryName);
-                                                      },
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(
-                                                            truncateText(
-                                                                snapshot
-                                                                    .data![
-                                                                        index]
-                                                                    .doThis,
-                                                                20),
-                                                            style: TextStyle(
-                                                              decoration: snapshot
-                                                                      .data![
-                                                                          index]
-                                                                      .isDone
-                                                                  ? TextDecoration
-                                                                      .lineThrough
-                                                                  : TextDecoration
-                                                                      .none,
-                                                              fontSize: 20,
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              color: Color(
-                                                                  0xffF5F3C1),
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            '${snapshot.data![index].whatTimehr}:${snapshot.data![index].whatTimemin}',
-                                                            style: const TextStyle(
-                                                                fontFamily:
-                                                                    'Poppins',
-                                                                fontSize: 19,
-                                                                color: Color(
-                                                                    0xff27E1C1)),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
+                                                    BorderRadius.circular(8)),
+                                            child: taskList[index].isDone
+                                                ? const Icon(
+                                                    Icons.check,
+                                                    size: 30,
+                                                    color: Color(0xff27E1C1),
                                                   )
-                                                ],
-                                              ),
-                                            );
-                                          });
-                                    } else if (snapshot.hasError) {
-                                      return Text(
-                                          '${snapshot.error.toString()} \nPlease try again later.');
-                                    } else {
-                                      return const Text(
-                                          'Something went wrong. \nPlease try again later.');
-                                    }
-                                  } else {
-                                    return const CircularProgressIndicator();
-                                  }
+                                                : null,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              _showEditTask(
+                                                  context,
+                                                  taskList[index].todos,
+                                                  taskList[index].hour,
+                                                  taskList[index].minute,
+                                                  taskList[index].isAM,
+                                                  taskList[index].day,
+                                                  taskList[index].month,
+                                                  taskList[index].year,
+                                                  taskList[index].isDone);
+                                              taskList.clear();
+                                            },
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  truncateText(
+                                                      taskList[index].todos,
+                                                      12),
+                                                  style: TextStyle(
+                                                    decoration: taskList[index]
+                                                            .isDone
+                                                        ? TextDecoration
+                                                            .lineThrough
+                                                        : TextDecoration.none,
+                                                    fontSize: 20,
+                                                    fontFamily: 'Poppins',
+                                                    color: Color(0xffF5F3C1),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  // ignore: unnecessary_brace_in_string_interps
+                                                  '${taskList[index].hour}:${taskList[index].minute}${taskList[index].isAM ? 'am' : 'pm'}',
+                                                  style: const TextStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 19,
+                                                      color: Color(0xff27E1C1)),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  );
                                 })),
                       ),
                     ),
@@ -304,20 +281,70 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin {
   }
 
   void _showAddTask(BuildContext context, categoryName) async {
+    todogo = box.get('todoGoUser');
+    category = todogo.categories
+        .firstWhere((category) => category.name == widget.categoryName);
     await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AddTask(categoryName: categoryName);
       },
-    );
+    ).then((_) {
+      setState(() {
+        if (category != null) {
+          for (var task in category.tasks) {
+            taskList.add(Task(
+                todos: task.todos,
+                isDone: task.isDone,
+                hour: task.hour,
+                minute: task.minute,
+                isAM: task.isAM,
+                day: task.day,
+                month: task.month,
+                year: task.year));
+          }
+        }
+      });
+    });
   }
 
-  void _showEditTask(BuildContext context, categoryName) async {
+  void _showEditTask(BuildContext context, todoTask, hr, min, isAm, day, mon,
+      year, isDone) async {
+    todogo = box.get('todoGoUser');
+    category = todogo.categories
+        .firstWhere((category) => category.name == widget.categoryName);
     await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return editTodo();
+        return editTodo(
+          categoryName: widget.categoryName,
+          todos: todoTask,
+          todoTask: todoTask,
+          isDone: isDone,
+          hr: hr,
+          min: min,
+          isAm: isAm,
+          day: day,
+          mon: mon,
+          year: year,
+        );
       },
-    );
+    ).then((_) {
+      setState(() {
+        if (category != null) {
+          for (var task in category.tasks) {
+            taskList.add(Task(
+                todos: task.todos,
+                isDone: task.isDone,
+                hour: task.hour,
+                minute: task.minute,
+                isAM: task.isAM,
+                day: task.day,
+                month: task.month,
+                year: task.year));
+          }
+        }
+      });
+    });
   }
 }

@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/auth/authController.dart';
@@ -290,11 +291,32 @@ class _loginPageState extends State<loginPage> {
         username: controllers.username.text.trim(),
         email: controllers.email.text.trim(),
         password: controllers.password.text.trim());
-    await AuthController.instance.createUser(user);
+    final connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      await AuthController.instance
+          .createUser(user, controllers.username.text.trim());
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      await AuthController.instance
+          .createUser(user, controllers.username.text.trim());
+    } else {
+      return Get.snackbar(
+          'You are offline.', 'Please connect to an internet and try again.',
+          snackPosition: SnackPosition.TOP);
+    }
   }
 
-  login() {
-    AuthController.instance.loginUser(
-        controllers.email.text.trim(), controllers.password.text.trim());
+  login() async {
+    final connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      return AuthController.instance.loginUser(
+          controllers.email.text.trim(), controllers.password.text.trim());
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      return AuthController.instance.loginUser(
+          controllers.email.text.trim(), controllers.password.text.trim());
+    } else {
+      return Get.snackbar(
+          'You are offline.', 'Please connect to an internet and try again.',
+          snackPosition: SnackPosition.TOP);
+    }
   }
 }
