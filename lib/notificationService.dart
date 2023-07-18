@@ -1,7 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
 
 class NotifyTask {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -66,13 +66,13 @@ class NotifyTask {
       String taskTitle,
       String categoryName) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'todogo',
-      'todogo',
-      importance: Importance.high,
-      priority: Priority.high,
-      playSound: true,
-    );
+        AndroidNotificationDetails('todogo', 'todogo',
+            importance: Importance.high,
+            priority: Priority.high,
+            playSound: true,
+            enableVibration: true,
+            color: Color(0xffF5F3C1),
+            colorized: true);
 
     final DarwinNotificationDetails iOSPlatformChannelSpecifics =
         DarwinNotificationDetails();
@@ -85,10 +85,10 @@ class NotifyTask {
     await flutterLocalNotificationsPlugin.zonedSchedule(
       todoId,
       taskTitle,
-      categoryName,
+      '$categoryName category',
       notificationDateTime,
       platformChannelSpecifics,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.alarmClock,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );

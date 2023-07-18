@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/screens/addtask_widget.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import '../offline_database/database.dart';
-import 'package:timezone/timezone.dart' as tz;
 
 class Category extends StatefulWidget {
   final categoryName;
@@ -35,7 +34,8 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin {
             isAM: task.isAM,
             day: task.day,
             month: task.month,
-            year: task.year));
+            year: task.year,
+            todoID: task.todoID));
       }
     }
 
@@ -44,6 +44,7 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    Size phoneSize = MediaQuery.of(context).size;
     String formattedMonth = DateFormat('MMM').format(dateNow);
     String formattedDay = DateFormat('dd').format(dateNow);
     String formattedYear = DateFormat('yyyy').format(dateNow);
@@ -78,7 +79,7 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: const Color(0xffF5F3C1),
       body: Container(
-        height: MediaQuery.of(context).size.height,
+        height: phoneSize.height,
         padding: const EdgeInsets.only(top: 30),
         child: Column(
           children: [
@@ -126,153 +127,181 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin {
                 )
               ],
             ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: (MediaQuery.of(context).size.height * 0.75) - 2.5,
-              margin: const EdgeInsets.only(top: 30),
-              padding: const EdgeInsets.fromLTRB(15, 10, 15, 5),
-              decoration: const BoxDecoration(
-                  color: Color(0xff27E1C1),
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(55),
-                      topRight: Radius.circular(55))),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Text(
-                          'ToDo List',
-                          style: TextStyle(
-                            fontFamily: 'Aylafs',
-                            fontSize: 40,
-                            color: Color(0xff0EA293),
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(left: 90, right: 30),
-                          child: GestureDetector(
-                            onTap: () {
-                              _showAddTask(context, widget.categoryName);
-                              taskList.clear();
-                            },
-                            child: Image.asset(
-                              'assets/images/add_task.png',
-                              width: 25,
-                              height: 25,
+            Expanded(
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                margin: const EdgeInsets.only(top: 30),
+                padding: const EdgeInsets.fromLTRB(15, 10, 15, 5),
+                decoration: const BoxDecoration(
+                    color: Color(0xff27E1C1),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(55),
+                        topRight: Radius.circular(55))),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Text(
+                            'ToDo List',
+                            style: TextStyle(
+                              fontFamily: 'Aylafs',
+                              fontSize: 40,
+                              color: Color(0xff0EA293),
                             ),
                           ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.63,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.63,
-                            child: ListView.builder(
-                                itemCount: taskList.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Container(
-                                    margin: const EdgeInsets.only(top: 10),
-                                    padding: const EdgeInsets.only(right: 15),
-                                    width:
-                                        MediaQuery.of(context).size.width - 30,
-                                    height: 70,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xff0EA293),
-                                      borderRadius: BorderRadius.circular(9),
-                                    ),
-                                    child: Row(
-                                      // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              taskList[index].isDone =
-                                                  !taskList[index].isDone;
-                                            });
-                                          },
-                                          child: AnimatedContainer(
-                                            duration: const Duration(
-                                                milliseconds: 700),
-                                            width: 40,
-                                            height: 40,
-                                            margin: const EdgeInsets.only(
-                                                left: 20, right: 20),
-                                            decoration: BoxDecoration(
-                                                color: const Color(0xffF5F3C1),
-                                                border: Border.all(
-                                                    color:
-                                                        const Color(0xff270564),
-                                                    width: 3),
-                                                borderRadius:
-                                                    BorderRadius.circular(8)),
-                                            child: taskList[index].isDone
-                                                ? const Icon(
-                                                    Icons.check,
-                                                    size: 30,
-                                                    color: Color(0xff27E1C1),
-                                                  )
-                                                : null,
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: GestureDetector(
+                          Container(
+                            margin: const EdgeInsets.only(left: 90, right: 30),
+                            child: GestureDetector(
+                              onTap: () {
+                                _showAddTask(context, widget.categoryName);
+                                taskList.clear();
+                              },
+                              child: Image.asset(
+                                'assets/images/add_task.png',
+                                width: 25,
+                                height: 25,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height / 1.5,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: SizedBox(
+                              height: MediaQuery.of(context).size.height / 1.5,
+                              child: ListView.builder(
+                                  itemCount: taskList.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Container(
+                                      margin: const EdgeInsets.only(top: 10),
+                                      padding: const EdgeInsets.only(right: 15),
+                                      width: MediaQuery.of(context).size.width -
+                                          30,
+                                      height: 70,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xff0EA293),
+                                        borderRadius: BorderRadius.circular(9),
+                                      ),
+                                      child: Row(
+                                        // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        children: [
+                                          GestureDetector(
                                             onTap: () {
-                                              _showEditTask(
-                                                  context,
+                                              setState(() {
+                                                taskList[index].isDone =
+                                                    !taskList[index].isDone;
+                                              });
+                                              Get.snackbar(
+                                                  taskList[index].isDone
+                                                      ? 'Task Finished'
+                                                      : 'Task Unfinished',
                                                   taskList[index].todos,
-                                                  taskList[index].hour,
-                                                  taskList[index].minute,
-                                                  taskList[index].isAM,
-                                                  taskList[index].day,
-                                                  taskList[index].month,
-                                                  taskList[index].year,
-                                                  taskList[index].isDone);
-                                              taskList.clear();
-                                            },
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  truncateText(
-                                                      taskList[index].todos,
-                                                      12),
-                                                  style: TextStyle(
-                                                    decoration: taskList[index]
-                                                            .isDone
-                                                        ? TextDecoration
-                                                            .lineThrough
-                                                        : TextDecoration.none,
-                                                    fontSize: 20,
-                                                    fontFamily: 'Poppins',
-                                                    color: Color(0xffF5F3C1),
+                                                  snackPosition:
+                                                      SnackPosition.TOP,
+                                                  icon: Image.asset(
+                                                    taskList[index].isDone
+                                                        ? 'assets/images/completedTask.gif'
+                                                        : 'assets/images/undoneTask.gif',
+                                                    height: 50,
+                                                    width: 50,
                                                   ),
-                                                ),
-                                                Text(
-                                                  // ignore: unnecessary_brace_in_string_interps
-                                                  '${taskList[index].hour}:${taskList[index].minute}${taskList[index].isAM ? 'am' : 'pm'}',
-                                                  style: const TextStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontSize: 19,
-                                                      color: Color(0xff27E1C1)),
-                                                )
-                                              ],
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      50, 10, 50, 10),
+                                                  duration:
+                                                      Duration(seconds: 5),
+                                                  borderRadius: 10,
+                                                  colorText: Color(0xffF5F3C1),
+                                                  backgroundColor:
+                                                      Color(0x830EA293));
+                                            },
+                                            child: AnimatedContainer(
+                                              duration: const Duration(
+                                                  milliseconds: 700),
+                                              width: 40,
+                                              height: 40,
+                                              margin: const EdgeInsets.only(
+                                                  left: 20, right: 20),
+                                              decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xffF5F3C1),
+                                                  border: Border.all(
+                                                      color: const Color(
+                                                          0xff270564),
+                                                      width: 3),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8)),
+                                              child: taskList[index].isDone
+                                                  ? const Icon(
+                                                      Icons.check,
+                                                      size: 30,
+                                                      color: Color(0xff27E1C1),
+                                                    )
+                                                  : null,
                                             ),
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                })),
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                _showEditTask(
+                                                    context,
+                                                    taskList[index].todos,
+                                                    taskList[index].hour,
+                                                    taskList[index].minute,
+                                                    taskList[index].isAM,
+                                                    taskList[index].day,
+                                                    taskList[index].month,
+                                                    taskList[index].year,
+                                                    taskList[index].isDone);
+                                                taskList.clear();
+                                              },
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    truncateText(
+                                                        taskList[index].todos,
+                                                        12),
+                                                    style: TextStyle(
+                                                      decoration:
+                                                          taskList[index].isDone
+                                                              ? TextDecoration
+                                                                  .lineThrough
+                                                              : TextDecoration
+                                                                  .none,
+                                                      fontSize: 20,
+                                                      fontFamily: 'Poppins',
+                                                      color: Color(0xffF5F3C1),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    // ignore: unnecessary_brace_in_string_interps
+                                                    '${taskList[index].hour}:${taskList[index].minute}${taskList[index].isAM ? 'am' : 'pm'}',
+                                                    style: const TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 19,
+                                                        color:
+                                                            Color(0xff27E1C1)),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  })),
+                        ),
                       ),
-                    ),
-                  ]),
+                    ]),
+              ),
             ),
           ],
         ),
@@ -301,7 +330,8 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin {
                 isAM: task.isAM,
                 day: task.day,
                 month: task.month,
-                year: task.year));
+                year: task.year,
+                todoID: task.todoID));
           }
         }
       });
@@ -341,7 +371,8 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin {
                 isAM: task.isAM,
                 day: task.day,
                 month: task.month,
-                year: task.year));
+                year: task.year,
+                todoID: task.todoID));
           }
         }
       });

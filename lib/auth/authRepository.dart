@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:todo_app/auth/authFailure.dart';
@@ -9,12 +11,15 @@ import 'package:todo_app/offline_database/database.dart';
 import 'package:todo_app/online_database/todogo_firebase.dart';
 import 'package:todo_app/screens/home.dart';
 
+import '../notificationService.dart';
+
 class AuthRepository extends GetxController {
   static AuthRepository get instance => Get.find();
   final _auth = FirebaseAuth.instance;
   late final Rx<User?> firebaseUser;
   final box = Hive.box('todogoBox');
 
+  NotifyTask notifyTask = NotifyTask();
   @override
   void onReady() {
     firebaseUser = Rx<User?>(_auth.currentUser);
@@ -25,11 +30,56 @@ class AuthRepository extends GetxController {
   }
 
   syncshit(email) async {
-    Get.snackbar('Syncing data', 'Please wait.',
-        snackPosition: SnackPosition.TOP);
-    final _todoGoFirebase = Get.put(SyncAppFirebase());
-    _todoGoFirebase.syncDatabase(email);
-    await FirebaseMessaging.instance.setAutoInitEnabled(true);
+    final connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      Get.snackbar(
+          'Syncing data', 'Please wait and don\'t turn off your internet.',
+          snackPosition: SnackPosition.TOP,
+          icon: Image.asset(
+            'assets/images/loading.gif',
+            height: 50,
+            width: 50,
+          ),
+          padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+          duration: Duration(seconds: 10),
+          borderRadius: 10,
+          colorText: Color(0xffF5F3C1),
+          backgroundColor: Color(0x830EA293));
+      final _todoGoFirebase = Get.put(SyncAppFirebase());
+      _todoGoFirebase.syncDatabase(email);
+      await FirebaseMessaging.instance.setAutoInitEnabled(true);
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      Get.snackbar(
+          'Syncing data', 'Please wait and don\'t turn off your internet.',
+          snackPosition: SnackPosition.TOP,
+          icon: Image.asset(
+            'assets/images/loading.gif',
+            height: 50,
+            width: 50,
+          ),
+          padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+          duration: Duration(seconds: 10),
+          borderRadius: 10,
+          colorText: Color(0xffF5F3C1),
+          backgroundColor: Color(0x830EA293));
+      final _todoGoFirebase = Get.put(SyncAppFirebase());
+      _todoGoFirebase.syncDatabase(email);
+      await FirebaseMessaging.instance.setAutoInitEnabled(true);
+    } else {
+      return Get.snackbar(
+          'You are offline.', 'Please connect to an internet and try again.',
+          snackPosition: SnackPosition.TOP,
+          icon: Image.asset(
+            'assets/images/noInternet.gif',
+            height: 50,
+            width: 50,
+          ),
+          padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+          duration: Duration(seconds: 5),
+          borderRadius: 10,
+          colorText: Color(0xffF5F3C1),
+          backgroundColor: Color(0x830EA293));
+    }
   }
 
   _setInitialscreen(User? user) {
@@ -38,6 +88,7 @@ class AuthRepository extends GetxController {
     } else {
       Get.offAll(const MyHomePage());
       syncshit(user.email);
+      notifyTask.initFirebaseMessaging();
     }
   }
 
@@ -98,6 +149,7 @@ class AuthRepository extends GetxController {
               day: todoDoc.get('day'),
               month: todoDoc.get('month'),
               year: todoDoc.get('year'),
+              todoID: todoDoc.get('todoID'),
             );
           }).toList();
         }
@@ -127,21 +179,36 @@ class AuthRepository extends GetxController {
       }
     } on FirebaseAuthException catch (e) {
       final ex = AuthFailure.code(e.code);
-      print('FIREBASE AUTH EXCEPTION - ${ex.message}');
       Get.snackbar(ex.message, 'Check your email/password and try again',
-          snackPosition: SnackPosition.TOP);
+          snackPosition: SnackPosition.TOP, duration: Duration(seconds: 4));
       throw ex;
     } catch (_) {
       const ex = AuthFailure();
-      print('FIREBASE AUTH EXCEPTION - ${ex.message}');
       Get.snackbar(ex.message, 'Check your email/password and try again',
-          snackPosition: SnackPosition.TOP);
+          snackPosition: SnackPosition.TOP, duration: Duration(seconds: 4));
       throw ex;
     }
   }
 
   Future<void> logout() async {
-    await _auth.signOut();
-    await box.clear();
+    final _todoGoFirebase = Get.put(SyncAppFirebase());
+    _todoGoFirebase.syncDatabase(FirebaseAuth.instance.currentUser!.email);
+    Get.snackbar('Syncing data before logging out',
+        'You will be logout automatically\nPlease wait and don\'t turn off your internet.',
+        snackPosition: SnackPosition.TOP,
+        icon: Image.asset(
+          'assets/images/loading.gif',
+          height: 50,
+          width: 50,
+        ),
+        padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+        duration: Duration(seconds: 10),
+        borderRadius: 10,
+        colorText: Color(0xffF5F3C1),
+        backgroundColor: Color(0x830EA293));
+    Future.delayed(Duration(seconds: 5), () async {
+      await _auth.signOut();
+      await box.clear();
+    });
   }
 }

@@ -12,7 +12,8 @@ class Task extends HiveObject {
       required this.isAM,
       required this.day,
       required this.month,
-      required this.year});
+      required this.year,
+      required this.todoID});
   @HiveField(0)
   String todos;
 
@@ -36,6 +37,9 @@ class Task extends HiveObject {
 
   @HiveField(7)
   String year;
+
+  @HiveField(8)
+  int todoID;
 }
 
 @HiveType(typeId: 1)

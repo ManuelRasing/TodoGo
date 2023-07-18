@@ -2,17 +2,16 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:todo_app/auth/authController.dart';
 import 'package:todo_app/auth/authRepository.dart';
 import 'package:todo_app/auth/taskCatController.dart';
-import 'package:todo_app/models/userModel.dart';
 import 'package:todo_app/notificationService.dart';
 import 'package:todo_app/screens/addCategory.dart';
 import 'dart:convert';
@@ -72,8 +71,8 @@ class _MyHomePageState extends State<MyHomePage> {
   var categories = <TodoCategory>[];
   @override
   void initState() {
-    tasknotification.initFirebaseMessaging();
     requestNotifPermission();
+    requestPermissionExactAlarm();
     getToken();
     todogo = box.get('todoGoUser');
     userName = todogo.username;
@@ -134,6 +133,17 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  requestPermissionExactAlarm() async {
+    var exact_alarm = await Permission.scheduleExactAlarm.status;
+    if (exact_alarm.isDenied) {
+      await Permission.scheduleExactAlarm.request();
+    } else if (exact_alarm.isPermanentlyDenied) {
+      openAppSettings();
+    } else if (exact_alarm.isGranted) {
+      print("EXACT ALARM GRANTED");
+    }
+  }
+
   void getToken() async {
     await FirebaseMessaging.instance.getToken().then((value) {
       setState(() {
@@ -179,8 +189,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
 
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.bottom]);
     return Scaffold(
       backgroundColor: const Color(0xffF5F3C1),
       body: Column(

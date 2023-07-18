@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:todo_app/auth/authRepository.dart';
@@ -49,10 +52,21 @@ class SyncAppFirebase extends GetxController {
           'day': task.day,
           'month': task.month,
           'year': task.year,
+          'todoID': task.todoID
         });
       }
     }
     Get.snackbar('Yay! Sync complete', 'Account updated successfully.',
-        snackPosition: SnackPosition.TOP);
+        snackPosition: SnackPosition.TOP,
+        icon: Image.asset(
+          'assets/images/yay.gif',
+          height: 50,
+          width: 50,
+        ),
+        padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+        duration: Duration(seconds: 5),
+        borderRadius: 10,
+        colorText: Color(0xffF5F3C1),
+        backgroundColor: Color(0x830EA293));
   }
 }

@@ -710,7 +710,7 @@ class _editTodoState extends State<editTodo> {
                                               });
                                             },
                                             startPosition:
-                                                int.parse(widget.min),
+                                                int.parse(widget.min) + 1,
                                             datas: _taskmin,
                                             listHeight: 15,
                                             unSelectTextStyle: const TextStyle(

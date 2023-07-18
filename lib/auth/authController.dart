@@ -18,7 +18,7 @@ class AuthController extends GetxController {
 
   createUser(UserModel user, userName) async {
     await userRepo.createUser(user, userName);
-    Future.delayed(const Duration(milliseconds: 3000), () {
+    Future.delayed(const Duration(milliseconds: 1000), () {
       registerUser(user.email, user.password);
     });
   }
@@ -29,7 +29,7 @@ class AuthController extends GetxController {
 
   void loginUser(String email, String password) {
     _authRepo.syncData(email);
-    Future.delayed(Duration(milliseconds: 2000), () {
+    Future.delayed(Duration(milliseconds: 1000), () {
       AuthRepository.instance.loginUserWithEmailAndPassword(email, password);
     });
   }
@@ -43,7 +43,17 @@ class AuthController extends GetxController {
     } else {
       return Get.snackbar(
           'You are offline.', 'Please connect to an internet and try again.',
-          snackPosition: SnackPosition.TOP);
+          snackPosition: SnackPosition.TOP,
+          icon: Image.asset(
+            'assets/images/noInternet.gif',
+            height: 50,
+            width: 50,
+          ),
+          padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+          duration: Duration(seconds: 5),
+          borderRadius: 10,
+          colorText: Color(0xffF5F3C1),
+          backgroundColor: Color(0x830EA293));
     }
   }
 }

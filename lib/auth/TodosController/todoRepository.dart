@@ -15,9 +15,11 @@ class TodoRepository extends GetxController {
   NotifyTask notifyTask = NotifyTask();
   final box = Hive.box('todogoBox');
   final philippineTimeZone = tz.getLocation('Asia/Manila');
+  final random = Random();
 
   addTodos(categoryName, doThis, hr, min, amPm, day, mon, year) {
     final userData = box.get('todoGoUser');
+    final uniqueId = random.nextInt(999999);
     final newTask = Task(
         todos: doThis,
         isDone: false,
@@ -26,7 +28,8 @@ class TodoRepository extends GetxController {
         isAM: amPm,
         day: day.toString(),
         month: mon.toString(),
-        year: year.toString());
+        year: year.toString(),
+        todoID: uniqueId);
 
     final category = userData.categories
         .firstWhere((category) => category.name == categoryName);
@@ -34,7 +37,7 @@ class TodoRepository extends GetxController {
       category.tasks.add(newTask);
       box.put('todoGoUser', userData);
     }
-    var taskDateTime = tz.TZDateTime(
+    final taskDateTime = tz.TZDateTime(
       philippineTimeZone,
       int.parse(year),
       int.parse(mon),
@@ -42,9 +45,25 @@ class TodoRepository extends GetxController {
       amPm ? int.parse(hr) : int.parse(hr) + 12,
       int.parse(min),
     );
-    final iD = int.parse(dateNow.millisecond.toString());
+
     notifyTask.scheduleNotification(
-        iD, taskDateTime, doThis.toString(), categoryName.toString());
+      uniqueId,
+      taskDateTime,
+      doThis.toString(),
+      categoryName.toString(),
+    );
+    Get.snackbar('Task Added', doThis,
+        snackPosition: SnackPosition.TOP,
+        icon: Image.asset(
+          'assets/images/addedTask.gif',
+          height: 50,
+          width: 50,
+        ),
+        padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+        duration: Duration(seconds: 5),
+        borderRadius: 10,
+        colorText: Color(0xffF5F3C1),
+        backgroundColor: Color(0x830EA293));
   }
 
   updateTodo(categoryName, todos, bool isDone, doThis, hr, min, bool amPm, day,
@@ -64,8 +83,36 @@ class TodoRepository extends GetxController {
         category.tasks[index].month = mon;
         category.tasks[index].year = year;
         box.put('todoGoUser', userData);
+
+        final taskDateTime = tz.TZDateTime(
+          philippineTimeZone,
+          int.parse(year),
+          int.parse(mon),
+          int.parse(day),
+          amPm ? int.parse(hr) : int.parse(hr) + 12,
+          int.parse(min),
+        );
+        notifyTask.scheduleNotification(
+          int.parse(category.tasks[index].todoID.toString()),
+          taskDateTime,
+          doThis.toString(),
+          categoryName.toString(),
+        );
       }
     }
+
+    Get.snackbar('Task Updated', doThis,
+        snackPosition: SnackPosition.TOP,
+        icon: Image.asset(
+          'assets/images/editedTask.gif',
+          height: 50,
+          width: 50,
+        ),
+        padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+        duration: Duration(seconds: 5),
+        borderRadius: 10,
+        colorText: Color(0xffF5F3C1),
+        backgroundColor: Color(0x830EA293));
   }
 
   deleteTodo(categoryName, todos) {
@@ -79,6 +126,18 @@ class TodoRepository extends GetxController {
       }
     }
     box.put('todoGoUser', userData);
+    Get.snackbar('Task Deleted', todos,
+        snackPosition: SnackPosition.TOP,
+        icon: Image.asset(
+          'assets/images/deletedTask.gif',
+          height: 50,
+          width: 50,
+        ),
+        padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
+        duration: Duration(seconds: 5),
+        borderRadius: 10,
+        colorText: Color(0xffF5F3C1),
+        backgroundColor: Color(0x830EA293));
   }
 
   getAllTodos() {

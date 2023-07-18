@@ -159,12 +159,14 @@ class _EditCategoryState extends State<EditCategory> {
                 color: Color(0xff270564),
               ),
             ),
-            Text(
-              cutStringIntoTwoLines(widget.categoryName, 18),
-              style: const TextStyle(
-                fontFamily: 'aAkhirTahun',
-                fontSize: 24,
-                color: Color(0xff0EA293),
+            Center(
+              child: Text(
+                cutStringIntoTwoLines(widget.categoryName, 18),
+                style: const TextStyle(
+                  fontFamily: 'aAkhirTahun',
+                  fontSize: 24,
+                  color: Color(0xff0EA293),
+                ),
               ),
             ),
             AnimatedSlide(

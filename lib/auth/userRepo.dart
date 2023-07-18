@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -8,6 +10,7 @@ import 'taskCatRepository.dart';
 
 class UserRepo extends GetxController {
   static UserRepo get instance => Get.find();
+  final random = Random();
 
   final _db = FirebaseFirestore.instance.collection('Users');
   final taskCatRepo = Get.put(TaskCatRepo());
@@ -22,6 +25,7 @@ class UserRepo extends GetxController {
   }
 
   createUser(UserModel user, username) async {
+    final uniqueId = random.nextInt(999999);
     var categoryList = <TodoCategory>[];
     final categories = [
       'Personal',
@@ -43,7 +47,8 @@ class UserRepo extends GetxController {
         isAM: isAm(int.parse(DateFormat('HH').format(dateNow))),
         day: DateFormat('dd').format(dateNow).toString(),
         month: dateNow.month.toString(),
-        year: dateNow.year.toString());
+        year: dateNow.year.toString(),
+        todoID: uniqueId);
     try {
       await _db.add(user.toJson()).then((DocumentReference doc) async {
         for (final category in categories) {
@@ -69,6 +74,7 @@ class UserRepo extends GetxController {
                 'day': DateFormat('dd').format(dateNow).toString(),
                 'month': dateNow.month.toString(),
                 'year': dateNow.year.toString(),
+                'todoID': uniqueId.toString()
               });
             });
           } catch (e) {
@@ -85,6 +91,7 @@ class UserRepo extends GetxController {
   }
 
   addCategory(String categoryName) {
+    final uniqueId = random.nextInt(999999);
     final task1 = Task(
         todos: 'Make your first todo task.',
         isDone: false,
@@ -93,7 +100,8 @@ class UserRepo extends GetxController {
         isAM: isAm(int.parse(DateFormat('HH').format(dateNow))),
         day: DateFormat('dd').format(dateNow).toString(),
         month: dateNow.month.toString(),
-        year: dateNow.year.toString());
+        year: dateNow.year.toString(),
+        todoID: uniqueId);
 
     final userData = box.get('todoGoUser');
     final newCategory = TodoCategory(name: categoryName, tasks: [task1]);
