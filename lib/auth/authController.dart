@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/auth/authRepository.dart';
@@ -6,9 +7,12 @@ import 'package:todo_app/auth/userRepo.dart';
 import 'package:todo_app/models/userModel.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+import '../online_database/todogo_firebase.dart';
+
 class AuthController extends GetxController {
   static AuthController get instance => Get.find();
 
+  final _todoGoFirebase = Get.put(SyncAppFirebase());
   final username = TextEditingController();
   final email = TextEditingController();
   final password = TextEditingController();
@@ -35,6 +39,8 @@ class AuthController extends GetxController {
   }
 
   logout() async {
+    await _todoGoFirebase
+        .syncDatabase(FirebaseAuth.instance.currentUser!.email);
     final connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
       return _authRepo.logout();

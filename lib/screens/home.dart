@@ -181,6 +181,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     setState(() {});
+
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.bottom]);
     String truncateText(String text, int maxLength) {
       if (text.length <= maxLength) {
         return text;
@@ -189,8 +192,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
 
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: [SystemUiOverlay.bottom]);
     return Scaffold(
       backgroundColor: const Color(0xffF5F3C1),
       body: Column(

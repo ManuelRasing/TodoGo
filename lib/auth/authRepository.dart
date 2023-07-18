@@ -87,7 +87,6 @@ class AuthRepository extends GetxController {
       Get.offAll(const loginPage());
     } else {
       Get.offAll(const MyHomePage());
-      syncshit(user.email);
       notifyTask.initFirebaseMessaging();
     }
   }
@@ -191,8 +190,6 @@ class AuthRepository extends GetxController {
   }
 
   Future<void> logout() async {
-    final _todoGoFirebase = Get.put(SyncAppFirebase());
-    _todoGoFirebase.syncDatabase(FirebaseAuth.instance.currentUser!.email);
     Get.snackbar('Syncing data before logging out',
         'You will be logout automatically\nPlease wait and don\'t turn off your internet.',
         snackPosition: SnackPosition.TOP,
