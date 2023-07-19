@@ -11,7 +11,8 @@ class SyncAppFirebase extends GetxController {
   final _authRepo = Get.put(AuthRepository());
 
   final box = Hive.box('todogoBox');
-  syncDatabase(email) async {
+  Future<void> syncDatabase(email) async {
+    await Future.delayed(Duration(seconds: 5));
     final userID = await _authRepo.getUserID(email);
     final _userDb = await FirebaseFirestore.instance
         .collection("Users")

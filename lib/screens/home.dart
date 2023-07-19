@@ -18,6 +18,7 @@ import 'dart:convert';
 
 import '../main.dart';
 import '../offline_database/database.dart';
+import '../online_database/todogo_firebase.dart';
 
 Future<String> fetchData() async {
   const url = 'https://api.api-ninjas.com/v1/quotes?category=happiness';
@@ -52,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final taskController = Get.put(TaskCatController());
   final authController = Get.put(AuthController());
   NotifyTask tasknotification = NotifyTask();
+  final _todoGoFirebase = Get.put(SyncAppFirebase());
 // Hive
   final box = Hive.box('todogoBox');
   var fcmToken;
@@ -71,9 +73,6 @@ class _MyHomePageState extends State<MyHomePage> {
   var categories = <TodoCategory>[];
   @override
   void initState() {
-    requestNotifPermission();
-    requestPermissionExactAlarm();
-    getToken();
     todogo = box.get('todoGoUser');
     userName = todogo.username;
     for (var category in todogo.categories) {
@@ -104,33 +103,12 @@ class _MyHomePageState extends State<MyHomePage> {
         catHeight = catHeight - 247;
       });
     }).catchError((error) {
-      setState(() {
-        quote = 'Failed to fetch data';
-      });
+      quote = 'Failed to fetch data';
     });
 
+    requestPermissionExactAlarm();
+    getToken();
     super.initState();
-  }
-
-  void requestNotifPermission() async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print("Notification Authorized");
-    } else if (settings.authorizationStatus ==
-        AuthorizationStatus.provisional) {
-      print("Notification Authorized Provisional");
-    } else {
-      print("Notification Not Authorizedl");
-    }
   }
 
   requestPermissionExactAlarm() async {
@@ -176,6 +154,35 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     categories.clear();
     super.dispose();
+  }
+
+  void showLoading(BuildContext context) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return Dialog(
+            insetPadding: EdgeInsets.all(15),
+            backgroundColor: Color(0x830EA293),
+            child: Row(
+              children: [
+                Image.asset(
+                  'assets/images/loading.gif',
+                  width: 80,
+                  height: 80,
+                ),
+                const Text(
+                  'Signing out,\nJust a moment....',
+                  style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xffF5F3C1)),
+                )
+              ],
+            ),
+          );
+        });
   }
 
   @override
@@ -232,7 +239,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               fontFamily: 'Aylafs',
                               fontSize: 64,
                               fontWeight: FontWeight.normal,
-                              color: Color(0xFF0EA293)),
+                              color: Color(0xFF0EA293),
+                              shadows: [
+                                Shadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.2),
+                                    offset: const Offset(5, 5),
+                                    blurRadius: 5),
+                              ]),
                         )
                       ],
                     ),
@@ -246,26 +259,28 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Container(
                 alignment: Alignment.topRight,
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        elevation: 1,
-                        padding: const EdgeInsets.all(0),
-                        backgroundColor: const Color(0xffD9D7A9),
-                        shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(25),
-                                bottomLeft: Radius.circular(25),
-                                bottomRight: Radius.circular(25)))),
-                    onLongPress: () {
-                      const Tooltip(
-                        message: 'Logout account',
-                      );
-                    },
-                    onPressed: () {
-                      authController.logout();
-                      // AuthRepository.instance.logout();
-                    },
-                    child: Image.asset('assets/images/logout.png')),
+                child: Tooltip(
+                  message: 'Logout account',
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          elevation: 1,
+                          padding: const EdgeInsets.all(0),
+                          backgroundColor: const Color(0xffD9D7A9),
+                          shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(25),
+                                  bottomLeft: Radius.circular(25),
+                                  bottomRight: Radius.circular(25)))),
+                      onPressed: () async {
+                        showLoading(context);
+                        await _todoGoFirebase.syncDatabase(
+                            FirebaseAuth.instance.currentUser!.email);
+                        Navigator.of(context).pop();
+                        authController.logout();
+                        // AuthRepository.instance.logout();
+                      },
+                      child: Image.asset('assets/images/logout.png')),
+                ),
               )
             ],
           ),

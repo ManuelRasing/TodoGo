@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/auth/authRepository.dart';
@@ -7,12 +6,9 @@ import 'package:todo_app/auth/userRepo.dart';
 import 'package:todo_app/models/userModel.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-import '../online_database/todogo_firebase.dart';
-
 class AuthController extends GetxController {
   static AuthController get instance => Get.find();
 
-  final _todoGoFirebase = Get.put(SyncAppFirebase());
   final username = TextEditingController();
   final email = TextEditingController();
   final password = TextEditingController();
@@ -22,7 +18,7 @@ class AuthController extends GetxController {
 
   createUser(UserModel user, userName) async {
     await userRepo.createUser(user, userName);
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    Future.delayed(const Duration(milliseconds: 1500), () {
       registerUser(user.email, user.password);
     });
   }
@@ -31,21 +27,19 @@ class AuthController extends GetxController {
     AuthRepository.instance.createUserWithEmailAndPassword(email, password);
   }
 
-  void loginUser(String email, String password) {
-    _authRepo.syncData(email);
-    Future.delayed(Duration(milliseconds: 1000), () {
-      AuthRepository.instance.loginUserWithEmailAndPassword(email, password);
-    });
+  Future<void> loginUser(String email, String password) async {
+    await _authRepo
+        .syncData(email)
+        .then((_) => _authRepo.loginUserWithEmailAndPassword(email, password));
   }
 
   logout() async {
-    await _todoGoFirebase
-        .syncDatabase(FirebaseAuth.instance.currentUser!.email);
     final connectivityResult = await (Connectivity().checkConnectivity());
+
     if (connectivityResult == ConnectivityResult.mobile) {
-      return _authRepo.logout();
+      _authRepo.logout();
     } else if (connectivityResult == ConnectivityResult.wifi) {
-      return _authRepo.logout();
+      _authRepo.logout();
     } else {
       return Get.snackbar(
           'You are offline.', 'Please connect to an internet and try again.',

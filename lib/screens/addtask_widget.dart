@@ -72,10 +72,10 @@ class _AddTaskState extends State<AddTask> {
       }
     }
     todoController.doThisController.addListener((isEmpty));
-
+    var advanceMin = int.parse(dateNow.minute.toString()) + 5;
     todoController.hrController.text =
         DateFormat('hh').format(dateNow).toString();
-    todoController.minController.text = dateNow.minute.toString();
+    todoController.minController.text = advanceMin.toString();
     todoController.dayController.text = dateNow.day.toString();
     todoController.monController.text = dateNow.month.toString();
     todoController.yearController.text = dateNow.year.toString();
@@ -84,7 +84,12 @@ class _AddTaskState extends State<AddTask> {
 
   @override
   void dispose() {
-    todoController.dispose();
+    todoController.doThisController.dispose();
+    todoController.hrController.dispose();
+    todoController.minController.dispose();
+    todoController.dayController.dispose();
+    todoController.monController.dispose();
+    todoController.yearController.dispose();
     super.dispose();
   }
 
@@ -264,7 +269,7 @@ class _AddTaskState extends State<AddTask> {
                               });
                             },
                             startPosition:
-                                int.parse(DateFormat('mm').format(dateNow)),
+                                int.parse(DateFormat('mm').format(dateNow)) + 5,
                             datas: _taskmin,
                             listHeight: 15,
                             unSelectTextStyle: const TextStyle(
@@ -412,11 +417,10 @@ class _AddTaskState extends State<AddTask> {
   }
 
   _saveTodo(categoryName, doThis, hr, min, amPm, day, mon, year) async {
-    return await todoController
-        .addTodo(categoryName, doThis, hr, min, amPm, day, mon, year)
-        .then((_) {
-      Navigator.of(context).pop();
-    });
+    await todoController.addTodo(
+        categoryName, doThis, hr, min, amPm, day, mon, year);
+
+    Navigator.of(context).pop();
   }
 }
 

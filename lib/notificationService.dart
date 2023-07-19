@@ -23,14 +23,8 @@ class NotifyTask {
       sound: true,
     );
 
-    // Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       showNotification(message);
-    });
-
-    // Handle messages when the app is in the background or terminated
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // You can handle the notification click event here
     });
   }
 

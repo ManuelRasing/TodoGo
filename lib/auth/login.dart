@@ -52,49 +52,52 @@ class _loginPageState extends State<loginPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size phoneSize = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: const Color(0xffF5F3C1),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/ToDoGo-Logo.png',
-              width: 150,
-              height: 150,
-            ),
-            const Text(
-              'ToDoGo',
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-                fontWeight: FontWeight.w600,
-                fontSize: 36,
-                color: Color(0xff270564),
+      body: SafeArea(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/ToDoGo-Logo.png',
+                width: 150,
+                height: 150,
               ),
-            ),
-            const Text(
-              'Stay on track get it done.',
-              style: TextStyle(
-                  fontFamily: 'Aylafs', fontSize: 24, color: Color(0xBE270564)),
-            ),
-            AnimatedPadding(
-              padding: signUp
-                  ? const EdgeInsets.only(top: 75, bottom: 0)
-                  : const EdgeInsets.only(top: 100, bottom: 16),
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-              child: Text(
-                signUp ? 'Create an account:' : 'Continue with your account:',
-                style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Color(0xff270564)),
+              const Text(
+                'ToDoGo',
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 36,
+                  color: Color(0xff270564),
+                ),
               ),
-            ),
-            SafeArea(
-              child: Expanded(
+              const Text(
+                'Stay on track get it done.',
+                style: TextStyle(
+                    fontFamily: 'Aylafs',
+                    fontSize: 24,
+                    color: Color(0xBE270564)),
+              ),
+              AnimatedPadding(
+                padding: signUp
+                    ? EdgeInsets.only(top: phoneSize.width / 10, bottom: 0)
+                    : EdgeInsets.only(top: phoneSize.width / 10, bottom: 16),
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeInOut,
+                child: Text(
+                  signUp ? 'Create an account:' : 'Continue with your account:',
+                  style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      color: Color(0xff270564)),
+                ),
+              ),
+              Expanded(
                   child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -153,7 +156,7 @@ class _loginPageState extends State<loginPage> {
                     ),
                   ),
                   AnimatedSlide(
-                    offset: signUp ? const Offset(0, 0) : const Offset(0, -1.4),
+                    offset: signUp ? const Offset(0, 0) : const Offset(0, -1),
                     duration: const Duration(milliseconds: 600),
                     curve: Curves.easeInOut,
                     child: Container(
@@ -205,11 +208,13 @@ class _loginPageState extends State<loginPage> {
                     ),
                   ),
                   AnimatedSlide(
-                    offset: signUp ? const Offset(0, 0) : const Offset(0, -1.4),
+                    offset: signUp ? const Offset(0, 0) : const Offset(0, -1),
                     duration: const Duration(milliseconds: 600),
                     curve: Curves.easeInOut,
                     child: Container(
-                      margin: const EdgeInsets.only(top: 16, bottom: 8),
+                      margin: signUp
+                          ? EdgeInsets.only(top: 16, bottom: 8)
+                          : EdgeInsets.zero,
                       child: Stack(
                         children: [
                           Container(
@@ -261,9 +266,8 @@ class _loginPageState extends State<loginPage> {
                     alignment: Alignment.centerRight,
                     width: MediaQuery.of(context).size.width,
                     padding: const EdgeInsets.symmetric(horizontal: 32),
-                    margin: const EdgeInsets.only(
-                      top: 16,
-                    ),
+                    margin:
+                        signUp ? EdgeInsets.zero : EdgeInsets.only(bottom: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -302,7 +306,7 @@ class _loginPageState extends State<loginPage> {
                               colorText: Color(0xffF5F3C1),
                               backgroundColor: Color(0x830EA293));
                         } else {
-                          signUp ? signup() : login();
+                          signUp ? signup(context) : login(context);
                           Get.snackbar(signUp ? 'Signing in' : 'Logging in',
                               'Please wait.',
                               snackPosition: SnackPosition.TOP,
@@ -312,7 +316,7 @@ class _loginPageState extends State<loginPage> {
                                 width: 50,
                               ),
                               padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
-                              duration: Duration(seconds: 5),
+                              //duration: Duration(seconds: 5),
                               borderRadius: 10,
                               colorText: Color(0xffF5F3C1),
                               backgroundColor: Color(0x830EA293));
@@ -329,7 +333,7 @@ class _loginPageState extends State<loginPage> {
                         signUp ? "Sign up" : "Login",
                         style: const TextStyle(
                           fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w800,
                           fontSize: 20,
                           color: Color(0xff270564),
                         ),
@@ -369,15 +373,47 @@ class _loginPageState extends State<loginPage> {
                     ),
                   ),
                 ],
-              )),
-            )
-          ],
+              ))
+            ],
+          ),
         ),
       ),
     );
   }
 
-  signup() async {
+  signup(context) async {
+    void showLoading(context) async {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (_) {
+            return Dialog(
+              backgroundColor: Color(0x830EA293),
+              child: Row(
+                children: [
+                  Image.asset(
+                    'assets/images/loading.gif',
+                    width: 80,
+                    height: 80,
+                  ),
+                  const Text(
+                    'Creating your account.\nPlease wait....',
+                    style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xffF5F3C1)),
+                  )
+                ],
+              ),
+            );
+          });
+      await Future.delayed(Duration(seconds: 10));
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+    }
+
     final user = UserModel(
         username: controllers.username.text.trim(),
         email: controllers.email.text.trim(),
@@ -399,9 +435,11 @@ class _loginPageState extends State<loginPage> {
           backgroundColor: Color(0x830EA293));
     } else {
       if (connectivityResult == ConnectivityResult.mobile) {
+        showLoading(context);
         await AuthController.instance
             .createUser(user, controllers.username.text.trim());
       } else if (connectivityResult == ConnectivityResult.wifi) {
+        showLoading(context);
         await AuthController.instance
             .createUser(user, controllers.username.text.trim());
       } else {
@@ -422,14 +460,48 @@ class _loginPageState extends State<loginPage> {
     }
   }
 
-  login() async {
+  login(context) async {
     final connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
-      return AuthController.instance.loginUser(
+
+    Future<void> showLoading(context) async {
+      await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return Dialog(
+            backgroundColor: Color(0x830EA293),
+            child: Row(
+              children: [
+                Image.asset(
+                  'assets/images/loading.gif',
+                  width: 80,
+                  height: 80,
+                ),
+                const Text(
+                  'Please wait while we \nload your tasks....',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xffF5F3C1),
+                  ),
+                )
+              ],
+            ),
+          );
+        },
+      );
+    }
+
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+      showLoading(context);
+
+      controllers.loginUser(
           controllers.email.text.trim(), controllers.password.text.trim());
-    } else if (connectivityResult == ConnectivityResult.wifi) {
-      return AuthController.instance.loginUser(
-          controllers.email.text.trim(), controllers.password.text.trim());
+      await Future.delayed(Duration(milliseconds: 10500));
+      Navigator.of(context, rootNavigator: true).pop();
+      // Dismiss the loading dialog
     } else {
       return Get.snackbar(
           'You are offline.', 'Please connect to an internet and try again.',
@@ -468,7 +540,7 @@ class _PassResetState extends State<PassReset> {
             builder: (context) {
               return AlertDialog(
                 icon: Image.asset(
-                  'assets/images/completedTask.gif',
+                  'assets/images/emailSent.gif',
                   width: 80,
                   height: 80,
                 ),

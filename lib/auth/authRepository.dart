@@ -84,9 +84,9 @@ class AuthRepository extends GetxController {
 
   _setInitialscreen(User? user) {
     if (user == null) {
-      Get.offAll(const loginPage());
+      Get.offAll(() => const loginPage());
     } else {
-      Get.offAll(const MyHomePage());
+      Get.offAll(() => const MyHomePage());
       notifyTask.initFirebaseMessaging();
     }
   }
@@ -97,8 +97,8 @@ class AuthRepository extends GetxController {
       await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       firebaseUser.value != null
-          ? Get.offAll(const MyHomePage())
-          : Get.offAll(const loginPage());
+          ? Get.offAll(() => const MyHomePage())
+          : Get.offAll(() => const loginPage());
     } on FirebaseAuthException catch (e) {
       final ex = AuthFailure.code(e.code);
       print('FIREBASE AUTH EXCEPTION - ${ex.message}');
@@ -123,7 +123,7 @@ class AuthRepository extends GetxController {
     return userID;
   }
 
-  syncData(email) async {
+  Future<void> syncData(email) async {
     final userID = await getUserID(email);
     final snapshot =
         await FirebaseFirestore.instance.collection('Users').doc(userID).get();
@@ -134,7 +134,9 @@ class AuthRepository extends GetxController {
         .get();
     var categories = <TodoCategory>[];
 
-    categoryRef.docs.forEach((categoryDoc) {
+    await Future.delayed(Duration(seconds: 10));
+
+    for (var categoryDoc in categoryRef.docs) {
       var taskList = <Task>[];
       categoryDoc.reference.collection('Todos').get().then((todosSnapshot) {
         if (todosSnapshot.docs.isNotEmpty) {
@@ -155,7 +157,7 @@ class AuthRepository extends GetxController {
 
         categories.add(TodoCategory(name: categoryDoc.id, tasks: taskList));
       });
-    });
+    }
 
     await Future.wait(categoryRef.docs
         .map((categoryDoc) => categoryDoc.reference.collection('Todos').get()));
@@ -163,8 +165,6 @@ class AuthRepository extends GetxController {
     final _todoGo =
         TodoGo(username: snapshot.data()!['Username'], categories: categories);
     box.put('todoGoUser', _todoGo);
-
-    print('Sync data completed');
   }
 
   Future<void> loginUserWithEmailAndPassword(
@@ -172,9 +172,9 @@ class AuthRepository extends GetxController {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       if (firebaseUser.value != null) {
-        Get.offAll(const MyHomePage());
+        Get.offAll(() => const MyHomePage());
       } else {
-        Get.offAll(const loginPage());
+        Get.offAll(() => const loginPage());
       }
     } on FirebaseAuthException catch (e) {
       final ex = AuthFailure.code(e.code);
@@ -190,22 +190,7 @@ class AuthRepository extends GetxController {
   }
 
   Future<void> logout() async {
-    Get.snackbar('Syncing data before logging out',
-        'You will be logout automatically\nPlease wait and don\'t turn off your internet.',
-        snackPosition: SnackPosition.TOP,
-        icon: Image.asset(
-          'assets/images/loading.gif',
-          height: 50,
-          width: 50,
-        ),
-        padding: EdgeInsets.fromLTRB(50, 10, 50, 10),
-        duration: Duration(seconds: 10),
-        borderRadius: 10,
-        colorText: Color(0xffF5F3C1),
-        backgroundColor: Color(0x830EA293));
-    Future.delayed(Duration(seconds: 5), () async {
-      await _auth.signOut();
-      await box.clear();
-    });
+    await box.clear();
+    await _auth.signOut();
   }
 }
