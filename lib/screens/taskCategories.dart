@@ -200,11 +200,46 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin {
                                           children: [
                                             GestureDetector(
                                               onTap: () {
+                                                todogo = box.get('todoGoUser');
                                                 setState(() {
                                                   taskList[index].isDone =
                                                       !taskList[index].isDone;
-                                                  box.put('todoGoUser', todogo);
                                                 });
+                                                for (var category
+                                                    in todogo.categories) {
+                                                  for (var task
+                                                      in category.tasks) {
+                                                    if (task.todoID == taskList[index].todoID &&
+                                                        task.todos ==
+                                                            taskList[index]
+                                                                .todos &&
+                                                        task.hour ==
+                                                            taskList[index]
+                                                                .hour &&
+                                                        task.minute ==
+                                                            taskList[index]
+                                                                .minute &&
+                                                        task.isAM ==
+                                                            taskList[index]
+                                                                .isAM &&
+                                                        task.day ==
+                                                            taskList[index]
+                                                                .day &&
+                                                        task.month ==
+                                                            taskList[index]
+                                                                .month &&
+                                                        task.year ==
+                                                            taskList[index]
+                                                                .year) {
+                                                      task.isDone =
+                                                          taskList[index]
+                                                              .isDone;
+                                                      break; // No need to continue searching, we found the task
+                                                    }
+                                                  }
+                                                }
+
+                                                box.put('todoGoUser', todogo);
                                                 Get.snackbar(
                                                     taskList[index].isDone
                                                         ? 'Task Finished'
