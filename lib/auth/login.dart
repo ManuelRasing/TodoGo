@@ -390,6 +390,8 @@ class _loginPageState extends State<loginPage> {
             return Dialog(
               backgroundColor: Color(0x830EA293),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Image.asset(
                     'assets/images/loading.gif',
@@ -471,6 +473,8 @@ class _loginPageState extends State<loginPage> {
           return Dialog(
             backgroundColor: Color(0x830EA293),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Image.asset(
                   'assets/images/loading.gif',

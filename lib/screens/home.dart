@@ -165,6 +165,8 @@ class _MyHomePageState extends State<MyHomePage> {
             insetPadding: EdgeInsets.all(15),
             backgroundColor: Color(0x830EA293),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Image.asset(
                   'assets/images/loading.gif',

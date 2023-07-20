@@ -203,6 +203,7 @@ class _CategoryState extends State<Category> with TickerProviderStateMixin {
                                                 setState(() {
                                                   taskList[index].isDone =
                                                       !taskList[index].isDone;
+                                                  box.put('todoGoUser', todogo);
                                                 });
                                                 Get.snackbar(
                                                     taskList[index].isDone
