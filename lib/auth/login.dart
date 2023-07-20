@@ -503,7 +503,7 @@ class _loginPageState extends State<loginPage> {
 
       controllers.loginUser(
           controllers.email.text.trim(), controllers.password.text.trim());
-      await Future.delayed(Duration(milliseconds: 10500));
+      await Future.delayed(Duration(milliseconds: 11000));
       Navigator.of(context, rootNavigator: true).pop();
       // Dismiss the loading dialog
     } else {
